@@ -2,7 +2,7 @@ import os, sys, logging
 
 logging.basicConfig()
 
-from tnef import TNEF
+from tnefparse import TNEF
 
 datadir = os.path.dirname(os.path.realpath(__file__)) + os.sep + "examples"
 
