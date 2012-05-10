@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages, Command
 import sys, os
 
-version = '1.0'
+version = '1.1'
 
 class PyTest(Command):
     user_options = []
@@ -23,7 +23,7 @@ setup(name='tnefparse',
       keywords='TNEF MAPI decoding mail email microsoft',
       author='Petri Savolainen',
       author_email='petri.savolainen@koodaamo.fi',
-      url='https://github.com/koodaamo/tnef',
+      url='https://github.com/koodaamo/tnefparse',
       license='LGPL',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       include_package_data=True,
