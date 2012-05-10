@@ -1,4 +1,4 @@
-tnefparse 1.0, 03/2012
+tnefparse 1.1, 03/2012
 ===================
 
  - Repackaged and renamed the library
