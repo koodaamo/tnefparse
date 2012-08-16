@@ -32,7 +32,7 @@ setup(name='tnefparse',
           # -*- Extra requirements: -*-
       ],
       entry_points = {
-         'console_scripts': ['tnefparse = tnef.cmdline:tnefparse']
+         'console_scripts': ['tnefparse = tnefparse.cmdline:tnefparse']
       },
       cmdclass = {'test': PyTest},
       )

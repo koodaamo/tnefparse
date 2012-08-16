@@ -1,3 +1,8 @@
+tnefparse 1.1.1, 08/2012 (unreleased)
+=====================================
+
+ - fixed entry point bug that caused 'tnefparse' cmd-line invocation to fail
+
 tnefparse 1.1, 03/2012
 ===================
 
