@@ -6,27 +6,28 @@ from util import bytes_to_int
 logging.basicConfig()
 logger = logging.getLogger("mapi-decode")
 
+SZMAPI_UNSPECIFIED    = 0x0000 # MAPI Unspecified
+SZMAPI_NULL           = 0x0001 # MAPI null property
+SZMAPI_SHORT          = 0x0002 # MAPI short (signed 16 bits)
+SZMAPI_INT            = 0x0003 # MAPI integer (signed 32 bits)
+SZMAPI_FLOAT          = 0x0004 # MAPI float (4 bytes)
+SZMAPI_DOUBLE         = 0x0005 # MAPI double
+SZMAPI_CURRENCY       = 0x0006 # MAPI currency (64 bits)
+SZMAPI_APPTIME        = 0x0007 # MAPI application time
+SZMAPI_ERROR          = 0x000a # MAPI error (32 bits)
+SZMAPI_BOOLEAN        = 0x000b # MAPI boolean (16 bits)
+SZMAPI_OBJECT         = 0x000d # MAPI embedded object
+SZMAPI_INT8BYTE       = 0x0014 # MAPI 8 byte signed int
+SZMAPI_STRING         = 0x001e # MAPI string
+SZMAPI_UNICODE_STRING = 0x001f # MAPI unicode-string (null terminated)
+#SZMAPI_PT_SYSTIME     = 0x001e # MAPI time (after 2038/01/17 22:14:07 or before 1970/01/01 00:00:00)
+SZMAPI_SYSTIME        = 0x0040 # MAPI time (64 bits)
+SZMAPI_CLSID          = 0x0048 # MAPI OLE GUID
+SZMAPI_BINARY         = 0x0102 # MAPI binary
+SZMAPI_BEATS_THE_HELL_OUTTA_ME = 0x0033
+
 def decode_mapi(data):
    "decode MAPI types"
-   SZMAPI_UNSPECIFIED    = 0x0000 # MAPI Unspecified
-   SZMAPI_NULL           = 0x0001 # MAPI null property
-   SZMAPI_SHORT          = 0x0002 # MAPI short (signed 16 bits)
-   SZMAPI_INT            = 0x0003 # MAPI integer (signed 32 bits)
-   SZMAPI_FLOAT          = 0x0004 # MAPI float (4 bytes)
-   SZMAPI_DOUBLE         = 0x0005 # MAPI double
-   SZMAPI_CURRENCY       = 0x0006 # MAPI currency (64 bits)
-   SZMAPI_APPTIME        = 0x0007 # MAPI application time
-   SZMAPI_ERROR          = 0x000a # MAPI error (32 bits)
-   SZMAPI_BOOLEAN        = 0x000b # MAPI boolean (16 bits)
-   SZMAPI_OBJECT         = 0x000d # MAPI embedded object
-   SZMAPI_INT8BYTE       = 0x0014 # MAPI 8 byte signed int
-   SZMAPI_STRING         = 0x001e # MAPI string
-   SZMAPI_UNICODE_STRING = 0x001f # MAPI unicode-string (null terminated)
-   #SZMAPI_PT_SYSTIME     = 0x001e # MAPI time (after 2038/01/17 22:14:07 or before 1970/01/01 00:00:00)
-   SZMAPI_SYSTIME        = 0x0040 # MAPI time (64 bits)
-   SZMAPI_CLSID          = 0x0048 # MAPI OLE GUID
-   SZMAPI_BINARY         = 0x0102 # MAPI binary
-   SZMAPI_BEATS_THE_HELL_OUTTA_ME = 0x0033
 
    dataLen = len(data)
    attrs = []
@@ -56,7 +57,7 @@ def decode_mapi(data):
                   offset += 4
             else:
                iidLen = bytes_to_int(data[offset:offset+4]); offset += 4
-               q,r = divmod(strLen, 4)
+               q,r = divmod(iidLen, 4)
                if r != 0:
                   iidLen += (4-r)
                   offset += iidLen
@@ -77,7 +78,9 @@ def decode_mapi(data):
 #            logger.debug("Number of values: %i" % num_vals)
             attr_data = []
             for j in range(num_vals):
-               length = bytes_to_int(data[offset:offset+4]); offset += 4
+               # inlined version of bytes_to_int, for performance:
+               length = ord(offset[0]) + (ord(offset[1]) << 8) + (ord(offset[2]) << 16) + (ord(offset[3]) << 24)
+               offset += 4
                q,r = divmod(length, 4)
                if r != 0:
                   length += (4-r)
@@ -102,7 +105,7 @@ def decode_mapi(data):
    return attrs
 
 
-class TNEFMAPI_Attribute:
+class TNEFMAPI_Attribute(object):
    "represents a mapi attribute"
 
    MAPI_ACKNOWLEDGEMENT_MODE = 0x0001

@@ -14,10 +14,8 @@ def bytes_to_int(bytes=None):
 
 def checksum(data):
    "calculate a checksum for the TNEF data"
-   sum = 0
-   for byte in data:
-      sum = (sum + ord(byte)) % 65536
-   return sum
+   # NOTE: under Python 3.2+ you can do this much faster with int.from_bytes
+   return sum([ord(x) for x in data]) & 0xFFFF
 
 
 def raw_mapi(dataLen, data):
