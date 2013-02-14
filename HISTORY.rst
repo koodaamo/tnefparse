@@ -1,3 +1,10 @@
+tnefparse 1.2, 2013
+===================
+
+ - performance improvements & bug fixes (Dave Baggett)
+ - added to_zip function for converting TNEF attachments into ZIPped ones (Dave Baggett)
+ - tnefparse is now used in the inky email client from Arcode
+
 tnefparse 1.1.1, 08/2012 (unreleased)
 =====================================
 
