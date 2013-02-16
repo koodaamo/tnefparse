@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages, Command
 import sys, os
 
-version = '1.1'
+version = '1.2'
 
 class PyTest(Command):
     user_options = []
