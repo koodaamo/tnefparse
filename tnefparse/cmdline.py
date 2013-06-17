@@ -3,7 +3,7 @@ import sys, argparse, logging
 logging.basicConfig()
 logging.root.setLevel(logging.ERROR)
 
-from tnef import TNEF, TNEFAttachment, TNEFObject
+from tnef import TNEF, TNEFAttachment, TNEFObject, TNEFSignatureError
 from mapi import TNEFMAPI_Attribute
 
 
@@ -46,7 +46,10 @@ def tnefparse():
       logging.root.setLevel(level)
 
    for tfp in args.file[0]:
-      t = TNEF(tfp.read(), do_checksum=args.checksum)
+      try:
+         t = TNEF(tfp.read(), do_checksum=args.checksum)
+      except TNEFSignatureError, e:
+         sys.exit(e.message)
       if args.overview:
          print("\nOverview of %s: \n" % tfp.name)
 
