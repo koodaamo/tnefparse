@@ -196,7 +196,7 @@ class TNEF:
    def __init__(self, data, do_checksum = True):
       self.signature = bytes_to_int(data[0:4])
       if self.signature != TNEF.TNEF_SIGNATURE:
-         sys.exit("Wrong TNEF signature: 0x%2.8x" % self.signature)
+         raise TNEFSignatureError("Wrong TNEF signature: 0x%2.8x" % self.signature, self.signature)
       self.key = bytes_to_int(data[4:6])
       self.objects = []
       self.attachments = []
@@ -270,3 +270,12 @@ def to_zip(data, default_name='no-name', deflate=True):
 
    # Return the binary data for the zip file
    return sfp.getvalue()
+
+
+class TNEFSignatureError(Exception):
+    
+    def __init__(self, message, signature):
+
+        Exception.__init__(self, message)
+
+        self.signature = signature
