@@ -78,8 +78,7 @@ def decode_mapi(data):
 #            logger.debug("Number of values: %i" % num_vals)
             attr_data = []
             for j in range(num_vals):
-               # inlined version of bytes_to_int, for performance:
-               length = ord(offset[0]) + (ord(offset[1]) << 8) + (ord(offset[2]) << 16) + (ord(offset[3]) << 24)
+               length = bytes_to_int(data[offset:offset+4])
                offset += 4
                q,r = divmod(length, 4)
                if r != 0:
