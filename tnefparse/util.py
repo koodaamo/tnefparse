@@ -1,15 +1,34 @@
 """utility functions
 """
+import sys
 import logging
 logger = logging.getLogger("tnef-decode")
 
-def bytes_to_int(bytes=None):
-   "transform multi-byte values into integers"
+
+# for compatibility, two versions of bytes_to_int
+
+def bytes_to_int_py3(bytes=None):
+   "transform multi-byte values into integers, python3 version"
+   n = num = 0
+   for b in bytes:
+      num += (b << n)
+      n += 8
+   return num
+
+
+def bytes_to_int_py2(bytes=None):
+   "transform multi-byte values into integers, python2 version"
    n = num = 0
    for b in bytes:
       num += ( ord(b) << n)
       n += 8
    return num
+
+
+if sys.hexversion > 0x03000000:
+  bytes_to_int = bytes_to_int_py3
+else:
+  bytes_to_int = bytes_to_int_py2
 
 
 def checksum(data):
