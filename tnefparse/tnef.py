@@ -4,8 +4,8 @@ import sys, logging
 
 logger = logging.getLogger("tnef-decode")
 
-from util import bytes_to_int, checksum
-from mapi import TNEFMAPI_Attribute, decode_mapi
+from .util import bytes_to_int, checksum
+from .mapi import TNEFMAPI_Attribute, decode_mapi
 
 
 class TNEFObject(object):

@@ -1,7 +1,7 @@
 "MAPI attribute definitions"
 
 import logging
-from util import bytes_to_int
+from .util import bytes_to_int
 
 logging.basicConfig()
 logger = logging.getLogger("mapi-decode")
