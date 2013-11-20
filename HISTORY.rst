@@ -1,3 +1,9 @@
+tnefparse 1.2.1, 2013
+======================
+
+ - add package to travis ci
+ - tests pass on Python 2.6/2.7/3.2/3.3
+
 tnefparse 1.2, 2013
 ===================
 
