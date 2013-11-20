@@ -107,7 +107,7 @@ class TNEFAttachment(object):
       elif attribute.name == TNEF.ATTATTACHMENT:
          self.mapi_attrs += decode_mapi(attribute.data)
       elif attribute.name == TNEF.ATTATTACHTITLE:
-         self.name = attribute.data.strip(chr(0))  # remove any NULLs
+         self.name = attribute.data.strip(b'\x00')  # remove any NULLs
       elif attribute.name == TNEF.ATTATTACHDATA:
          self.data = attribute.data
       else:
