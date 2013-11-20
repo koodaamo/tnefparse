@@ -18,3 +18,12 @@ What's new in this release:
 Contributions in this release mostly by Dave Baggett of Arcode, makers of the inky email client.
 
 Please see the HISTORY.txt file for full release notes.
+
+.. image:: https://badge.fury.io/py/tnefparse.png
+    :target: http://badge.fury.io/py/tnefparse
+
+.. image:: https://travis-ci.org/petri/tnefparse.png?branch=master
+        :target: https://travis-ci.org/petri/tnefparse
+
+.. image:: https://pypip.in/d/tnefparse/badge.png
+        :target: https://crate.io/packages/tnefparse?version=latest
