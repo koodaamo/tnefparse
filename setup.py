@@ -17,8 +17,7 @@ class PyTest(Command):
 setup(name='tnefparse',
       version=version,
       description="a TNEF decoding library written in python, without external dependencies",
-      long_description="""\
-""",
+      long_description="""\n""",
       classifiers=[
        'Topic :: Communications :: Email',
        'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
@@ -41,9 +40,6 @@ setup(name='tnefparse',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       include_package_data=True,
       zip_safe=True,
-      install_requires=[
-          # -*- Extra requirements: -*-
-      ],
       entry_points = {
          'console_scripts': ['tnefparse = tnefparse.cmdline:tnefparse']
       },

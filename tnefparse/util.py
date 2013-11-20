@@ -39,6 +39,7 @@ else:
   bytes_to_int = bytes_to_int_py2
   checksum = checksum_py2
 
+
 def raw_mapi(dataLen, data):
    "debug raw MAPI data when decoding MAPI types"
    loop = 0
