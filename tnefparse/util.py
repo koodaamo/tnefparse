@@ -5,16 +5,13 @@ import logging
 logger = logging.getLogger("tnef-decode")
 
 
-# for compatibility, two versions of bytes_to_int
+# For compatibility, added two versions of bytes_to_int and checksum for now.
+# TODO: refactor?
 
 def bytes_to_int_py3(bytes=None):
    "transform multi-byte values into integers, python3 version"
-   n = num = 0
-   for b in bytes:
-      num += (b << n)
-      n += 8
-   return num
-
+   # NOTE: byte ordering & signage based on trial and error against tests
+   return int.from_bytes(bytes, byteorder="little", signed=False)
 
 def bytes_to_int_py2(bytes=None):
    "transform multi-byte values into integers, python2 version"
@@ -24,18 +21,23 @@ def bytes_to_int_py2(bytes=None):
       n += 8
    return num
 
+def checksum_py3(data):
+   "calculate a checksum for the TNEF data"
+   # TODO: use int.from_bytes
+   return sum([x for x in data]) & 0xFFFF
 
-if sys.hexversion > 0x03000000:
-  bytes_to_int = bytes_to_int_py3
-else:
-  bytes_to_int = bytes_to_int_py2
-
-
-def checksum(data):
+def checksum_py2(data):
    "calculate a checksum for the TNEF data"
    # NOTE: under Python 3.2+ you can do this much faster with int.from_bytes
    return sum([ord(x) for x in data]) & 0xFFFF
 
+
+if sys.hexversion > 0x03000000:
+  bytes_to_int = bytes_to_int_py3
+  checksum = checksum_py3
+else:
+  bytes_to_int = bytes_to_int_py2
+  checksum = checksum_py2
 
 def raw_mapi(dataLen, data):
    "debug raw MAPI data when decoding MAPI types"
