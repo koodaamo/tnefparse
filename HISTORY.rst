@@ -1,8 +1,9 @@
 tnefparse 1.2.1, 2013
 ======================
 
+ - Python 3 compatibility; tests pass on Python 2.6/2.7/3.2/3.3
  - add package to travis ci
- - tests pass on Python 2.6/2.7/3.2/3.3
+ - add tox.ini for testing using https://testrun.org/tox
 
 tnefparse 1.2, 2013
 ===================
