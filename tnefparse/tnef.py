@@ -247,7 +247,7 @@ class TNEF:
 			# handle MAPI properties
 			elif obj.name == TNEF.ATTMAPIPROPS:
 				self.mapiprops = decode_mapi(obj.data)
-				logger.info("found mapi=%s", self.mapiprops)
+				logger.debug("found mapi=%s", self.mapiprops)
 				# handle BODY property
 				for p in self.mapiprops:
 					if p.name == TNEFMAPI_Attribute.MAPI_BODY:
