@@ -1,12 +1,19 @@
 """extracts TNEF encoded content from for example winmail.dat attachments.
 """
 import sys, logging
+from datetime import datetime
 
 logger = logging.getLogger("tnef-decode")
 
 from .util import bytes_to_int, checksum
 from .mapi import TNEFMAPI_Attribute, decode_mapi
 
+
+def _parse_null_str(data):
+	return data[0:data.find('\0')]
+
+def _parse_date(data):
+	return datetime(*[bytes_to_int(data[n:n+2]) for n in range(0, 12, 2)])
 
 class TNEFObject(object):
 	"a TNEF object that may contain a property and an attachment"
@@ -28,9 +35,38 @@ class TNEFObject(object):
 			calc_checksum = att_checksum
 		# whether the checksum is ok
 		self.good_checksum = calc_checksum == att_checksum
+		if self.name in (TNEF.ATTDATESTART, TNEF.ATTDATEEND, TNEF.ATTDATESENT,
+				TNEF.ATTDATERECD, TNEF.ATTATTACHCREATEDATE,
+				TNEF.ATTATTACHMODIFYDATE, TNEF.ATTDATEMODIFY, ):
+			self.data = _parse_date(self.data)
+		elif self.name in (TNEF.ATTPRIORITY, TNEF.ATTAIDOWNER, ):
+			self.data = bytes_to_int(self.data)
+		elif self.name in (TNEF.ATTTNEFVERSION, ):
+			self.data = [bytes_to_int(self.data[n:n+2]) for n in range(0, 4, 2)]
+		elif self.name in (TNEF.ATTOEMCODEPAGE, ):
+			self.data = {
+				874: "TIS-620",
+				932: "SHIFT-JIS",
+				936: "GBK",
+				949: "EUC-KR",
+				950: "BIG5",
+				1250: "WINDOWS-1250",
+				1251: "WINDOWS-1251",
+				1252: "WINDOWS-1252",
+				1253: "WINDOWS-1253",
+				1254: "WINDOWS-1254",
+				1255: "WINDOWS-1255",
+				1256: "WINDOWS-1256",
+				1257: "WINDOWS-1257",
+				1258: "WINDOWS-1258",
+			}.get(bytes_to_int(self.data), None)
+		elif self.name in (TNEF.ATTREQUESTRES, ):
+			self.data = bool(bytes_to_int(self.data))
+		elif self.name in (TNEF.ATTMESSAGEID, TNEF.ATTMESSAGECLASS, TNEF.ATTMESSAGEID, TNEF.ATTSUBJECT, ):
+			self.data = _parse_null_str(self.data)
 
 	def __str__(self):
-		return "<%s[%s]: %s=%.70s>" % (self.__class__.__name__, self.length, TNEF.codes.get(self.name), repr(self.data))
+		return "<%s[%s]: %s(0x%04x)=%.70s>" % (self.__class__.__name__, self.length, TNEF.codes.get(self.name), self.name, repr(self.data))
 
 
 class TNEFAttachment(object):
