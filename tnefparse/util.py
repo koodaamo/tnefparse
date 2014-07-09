@@ -1,9 +1,16 @@
 """utility functions
 """
-import sys
-import logging
-logger = logging.getLogger("tnef-decode")
+from sys import hexversion
+from datetime import datetime
+from logging import getLogger
+logger = getLogger("tnef-decode")
 
+
+def _parse_null_str(data):
+	return data[0:data.find('\0')]
+
+def _parse_date(data):
+	return datetime(*[bytes_to_int(data[n:n+2]) for n in range(0, 12, 2)])
 
 # For compatibility, added two versions of bytes_to_int and checksum for now.
 # TODO: refactor?
@@ -32,7 +39,7 @@ def checksum_py2(data):
 	return sum([ord(x) for x in data]) & 0xFFFF
 
 
-if sys.hexversion > 0x03000000:
+if hexversion > 0x03000000:
 	bytes_to_int = bytes_to_int_py3
 	checksum = checksum_py3
 else:

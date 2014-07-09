@@ -1,10 +1,8 @@
 "MAPI attribute definitions"
 
-import logging
-from .util import bytes_to_int
-
-logging.basicConfig()
-logger = logging.getLogger("mapi-decode")
+from logging import getLogger
+logger = getLogger("mapi-decode")
+from .util import bytes_to_int, _parse_null_str
 
 SZMAPI_UNSPECIFIED = 0x0000 # MAPI Unspecified
 SZMAPI_NULL = 0x0001 # MAPI null property
@@ -29,72 +27,81 @@ SZMAPI_BEATS_THE_HELL_OUTTA_ME = 0x0033
 MULTI_VALUE_FLAG = 0x1000
 GUID_EXISTS_FLAG = 0x8000
 
-def decode_mapi(data):
-	"decode MAPI types"
-
-	dataLen = len(data)
-	attrs = []
-	offset = 0
-	num_properties = bytes_to_int(data[offset:offset+4]); offset += 4
-	logger.info("%d MAPI properties", num_properties)
-	try:
-		for i in range(num_properties):
-			if offset >= dataLen:
-				logger.warn("Wrong number of propertries")
-				break
-			attr_type = bytes_to_int(data[offset:offset+2]); offset += 2
-			attr_multi_value = bool(attr_type & MULTI_VALUE_FLAG); attr_type &= ~MULTI_VALUE_FLAG # TODO
-			logger.debug("Attribute type: 0x%04x", attr_type)
-			attr_name = bytes_to_int(data[offset:offset+2]); offset += 2
-			attr_guid_exists = bool(attr_name & GUID_EXISTS_FLAG); attr_name &= ~GUID_EXISTS_FLAG
-			logger.debug("Attribute name: 0x%04x", attr_name)
-			guid = ''
-			if attr_guid_exists:
-				guid = '%32.32x' % bytes_to_int(data[offset:offset+16]); offset += 16
-				kind = bytes_to_int(data[offset:offset+4]); offset += 4
-				logger.debug("Kind: %8.8x", kind)
-				if kind == 0:
-					# Skip the iid
-					offset += 4
+class TNEFMAPI_Object(object):
+	def __init__(self, data):
+		"decode MAPI types"
+		dataLen = len(data)
+		attrs = []
+		offset = 0
+		num_properties = bytes_to_int(data[offset:offset+4]); offset += 4
+		logger.info("%d MAPI properties", num_properties)
+		try:
+			for i in range(num_properties):
+				if offset >= dataLen:
+					logger.warn("Wrong number of propertries")
+					break
+				attr_type = bytes_to_int(data[offset:offset+2]); offset += 2
+				attr_multi_value = bool(attr_type & MULTI_VALUE_FLAG); attr_type &= ~MULTI_VALUE_FLAG # TODO
+				logger.debug("Attribute type: 0x%04x", attr_type)
+				attr_name = bytes_to_int(data[offset:offset+2]); offset += 2
+				attr_guid_exists = bool(attr_name & GUID_EXISTS_FLAG); attr_name &= ~GUID_EXISTS_FLAG
+				logger.debug("Attribute name: 0x%04x", attr_name)
+				guid = ''
+				if attr_guid_exists:
+					guid = '%32.32x' % bytes_to_int(data[offset:offset+16]); offset += 16
+					kind = bytes_to_int(data[offset:offset+4]); offset += 4
+					logger.debug("Kind: %8.8x", kind)
+					if kind == 0:
+						# Skip the iid
+						offset += 4
+					else:
+						iidLen = bytes_to_int(data[offset:offset+4]); offset += 4
+						q,r = divmod(iidLen, 4)
+						if r != 0:
+							iidLen += (4-r)
+							offset += iidLen
+				attr_data = None
+				if attr_type == SZMAPI_SHORT:
+					attr_data = data[offset:offset+2]; offset += 2
+				elif attr_type == SZMAPI_BOOLEAN:
+					attr_data = bool(data[offset:offset+4]); offset += 4
+				elif attr_type in (SZMAPI_INT, SZMAPI_FLOAT, SZMAPI_ERROR, ): # TODO float is wrong here!
+					attr_data = data[offset:offset+4]; offset += 4
+				elif attr_type in (SZMAPI_DOUBLE, SZMAPI_APPTIME, SZMAPI_CURRENCY, SZMAPI_INT8BYTE, SZMAPI_SYSTIME): # TODO: double is wrong here
+					attr_data = data[offset:offset+8]; offset += 8
+				elif attr_type == SZMAPI_CLSID:
+					attr_data = data[offset:offset+16]; offset += 16
+				elif attr_type in (SZMAPI_STRING, SZMAPI_UNICODE_STRING, SZMAPI_OBJECT, SZMAPI_BINARY, SZMAPI_UNSPECIFIED):
+					num_vals = bytes_to_int(data[offset:offset+4]); offset += 4
+					logger.debug("Number of values: %d", num_vals)
+					attr_data = []
+					for j in range(num_vals):
+						# inlined version of bytes_to_int, for performance:
+						if offset + 4 >= dataLen:
+							break
+						length = ord(data[offset]) + (ord(data[offset+1]) << 8) + (ord(data[offset+2]) << 16) + (ord(data[offset+3]) << 24); offset += 4
+						# length = bytes_to_int(data[offset:offset+4]); offset += 4
+						logger.debug("Length: %d", length)
+						q, r = divmod(length, 4)
+						if r:
+							length += 4 - r
+						logger.debug("Length: %d", length)
+						if attr_type == SZMAPI_UNICODE_STRING:
+							attr_data.append(_parse_null_str(unicode(data[offset:offset+length], 'utf-16'))); offset += length
+						else:
+							attr_data.append(_parse_null_str(data[offset:offset+length])); offset += length
 				else:
-					iidLen = bytes_to_int(data[offset:offset+4]); offset += 4
-					q,r = divmod(iidLen, 4)
-					if r != 0:
-						iidLen += (4-r)
-						offset += iidLen
-			attr_data = None
-			if attr_type == SZMAPI_SHORT:
-				attr_data = data[offset:offset+2]; offset += 2
-			elif attr_type in (SZMAPI_INT, SZMAPI_FLOAT, SZMAPI_ERROR, SZMAPI_BOOLEAN):
-				attr_data = data[offset:offset+4]; offset += 4
-			elif attr_type in (SZMAPI_DOUBLE, SZMAPI_APPTIME, SZMAPI_CURRENCY, SZMAPI_INT8BYTE, SZMAPI_SYSTIME):
-				attr_data = data[offset:offset+8]; offset += 8
-			elif attr_type == SZMAPI_CLSID:
-				attr_data = data[offset:offset+16]; offset += 16
-			elif attr_type in (SZMAPI_STRING, SZMAPI_UNICODE_STRING, SZMAPI_OBJECT, SZMAPI_BINARY, SZMAPI_UNSPECIFIED):
-				num_vals = bytes_to_int(data[offset:offset+4]); offset += 4
-				logger.debug("Number of values: %d", num_vals)
-				attr_data = []
-				for j in range(num_vals):
-					# inlined version of bytes_to_int, for performance:
-					length = ord(data[offset]) + (ord(data[offset+1]) << 8) + (ord(data[offset+2]) << 16) + (ord(data[offset+3]) << 24); offset += 4
-					# length = bytes_to_int(data[offset:offset+4]); offset += 4
-					logger.debug("Length: %d", length)
-					q, r = divmod(length, 4)
-					if r:
-						length += 4 - r
-					logger.debug("Length: %d", length)
-					attr_data.append(data[offset:offset+length]); offset += length
-			else:
-				logger.warn("## Unknown MAPI type 0x%04x", attr_type)
-				logger.warn("Attribute name: 0x%04x", attr_name)
-				break
-			logger.debug("Adding MAPI attribute %d to list", (i+1))
-			attr = TNEFMAPI_Attribute(attr_type, attr_name, attr_data, guid)
-			attrs.append(attr)
-	except Exception as e:
-		logger.exception('decode_mapi Exception %s', e)
-	return attrs
+					logger.warn("## Unknown MAPI type 0x%04x", attr_type)
+					logger.warn("Attribute name: 0x%04x", attr_name)
+					break
+				logger.debug("Adding MAPI attribute %d to list", (i+1))
+				attrs.append(TNEFMAPI_Attribute(attr_type, attr_name, attr_data, guid))
+		except Exception as e:
+			logger.exception('decode mapi exception %s', e)
+		self.attrs = attrs
+
+	def __str__(self):
+		return "<%s: "% (self.__class__.__name__, )
 
 
 class TNEFMAPI_Attribute(object):
@@ -959,6 +966,5 @@ class TNEFMAPI_Attribute(object):
 		self.guid = guid
 
 	def __str__(self):
-		aname = TNEFMAPI_Attribute.codes.get(self.name, "UNKNOWN!")
-		return "<ATTR: %s>" % aname
+		return "<%s(0x%04x): %s(0x%04x)=%.70s>"% (self.__class__.__name__, self.attr_type, TNEFMAPI_Attribute.codes.get(self.name, "UNKNOWN_%04x"% self.name), self.name, repr(self.data))
 

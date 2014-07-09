@@ -1,21 +1,14 @@
 """extracts TNEF encoded content from for example winmail.dat attachments.
 """
-import sys, logging
-from datetime import datetime
+from logging import getLogger
 
-logger = logging.getLogger("tnef-decode")
+logger = getLogger("tnef-decode")
 
-from .util import bytes_to_int, checksum
-from .mapi import TNEFMAPI_Attribute, decode_mapi
+from .util import bytes_to_int, checksum, _parse_null_str, _parse_date
+from .mapi import TNEFMAPI_Attribute, TNEFMAPI_Object
 
 
-def _parse_null_str(data):
-	return data[0:data.find('\0')]
-
-def _parse_date(data):
-	return datetime(*[bytes_to_int(data[n:n+2]) for n in range(0, 12, 2)])
-
-class TNEFObject(object):
+class TNEF_Object(object):
 	"a TNEF object that may contain a property and an attachment"
 
 	def __init__(self, data, do_checksum=False):
@@ -65,7 +58,7 @@ class TNEFObject(object):
 		elif self.name in (TNEF.ATTMESSAGEID, TNEF.ATTMESSAGECLASS, TNEF.ATTMESSAGEID, TNEF.ATTSUBJECT, ):
 			self.data = _parse_null_str(self.data)
 		elif self.name in (TNEF.ATTMAPIPROPS, ):
-			pass
+			self.data = TNEFMAPI_Object(self.data)
 
 	def __str__(self):
 		return "<%s[%s]: %s(0x%04x)=%.70s>" % (self.__class__.__name__, self.length, TNEF.codes.get(self.name), self.name, repr(self.data))
@@ -125,7 +118,7 @@ class TNEFAttachment(object):
 				attr = a
 				break
 		if attr is not None:
-			fn = str(attr.data).replace('0','')
+			fn = attr.data
 		else:
 			fn = self.name
 		return fn.split('\\')[-1]
@@ -134,11 +127,11 @@ class TNEFAttachment(object):
 	def add_attr(self, attribute):
 		logger.debug("Attachment attr name: 0x%4.4x", attribute.name)
 		if attribute.name == TNEF.ATTATTACHMODIFYDATE:
-			logger.debug("No date support yet!")
+			self.timestamp = attribute.data
 		elif attribute.name == TNEF.ATTATTACHMENT:
-			self.mapi_attrs += decode_mapi(attribute.data)
+			self.mapi_attrs += attribute.data
 		elif attribute.name == TNEF.ATTATTACHTITLE:
-			self.name = attribute.data.strip(b'\x00') # remove any NULLs
+			self.name = attribute.data
 		elif attribute.name == TNEF.ATTATTACHDATA:
 			self.data = attribute.data
 		else:
@@ -226,69 +219,48 @@ class TNEF:
 	def __init__(self, data, do_checksum = True):
 		self.signature = bytes_to_int(data[0:4])
 		if self.signature != TNEF.TNEF_SIGNATURE:
-			sys.exit("Wrong TNEF signature: 0x%2.8x" % self.signature)
-		self.key = bytes_to_int(data[4:6])
+			raise Exception("Wrong TNEF signature: 0x%2.8x" % self.signature)
+		self.key = bytes_to_int(data[4:6]); offset = 6
 		self.objects = []
-		self.attachments = []
-		self.mapiprops = []
-		offset = 6
 		if not do_checksum:
 			logger.info("Skipping checksum for performance")
 		while offset < len(data):
-			obj = TNEFObject(data[offset: offset+len(data)], do_checksum)
+			obj = TNEF_Object(data[offset: offset+len(data)], do_checksum)
 			offset += obj.length
 			self.objects.append(obj)
-			# handle attachments
-			if obj.name == TNEF.ATTATTACHRENDDATA:
-				attachment = TNEFAttachment()
-				self.attachments.append(attachment)
-			elif obj.level == TNEF.LVL_ATTACHMENT:
-				attachment.add_attr(obj)
-			# handle MAPI properties
-			elif obj.name == TNEF.ATTMAPIPROPS:
-				self.mapiprops = decode_mapi(obj.data)
-				logger.debug("found mapi=%s", self.mapiprops)
-				# handle BODY property
-				for p in self.mapiprops:
-					if p.name == TNEFMAPI_Attribute.MAPI_BODY:
-						self.body = p.data
-					elif p.name == TNEFMAPI_Attribute.MAPI_BODY_HTML:
-						self.htmlbody = p.data
-			else:
-				logger.debug("Unknown TNEF Object: %s", obj)
 
-	def has_body(self):
-		return True if (self.body or self.htmlbody) else False
+	def _get_attachments(self):
+		# handle attachments
+		a = None
+		for obj in self.objects:
+			if obj.name == TNEF.ATTATTACHRENDDATA:
+				if a:
+					yield a
+				a = obj
+			elif obj.level == TNEF.LVL_ATTACHMENT and a:
+				a.add_attr(obj)
+	attachments = property(_get_attachments)
+
+	def _get_mapiprops(self):
+		for obj in self.objects:
+			if obj.name == TNEF.ATTMAPIPROPS:
+				for attr in obj.data.attrs:
+					yield attr
+	mapiprops = property(_get_mapiprops)
+
+	def _get_body(self):
+		for p in self.mapiprops:
+			if p.name == TNEFMAPI_Attribute.MAPI_BODY:
+				return p.data
+	body = property(_get_body)
+
+	def _get_htmlbody(self):
+		for p in self.mapiprops:
+			if p.name == TNEFMAPI_Attribute.MAPI_BODY_HTML:
+				return p.data
+	htmlbody = property(_get_htmlbody)
 
 	def __str__(self):
-		atts = (", %i attachments" % len(self.attachments)) if self.attachments else ''
-		return "<%s: 0x%2.2x%s>" % (self.__class__.__name__, self.key, atts)
+		attachments = (", %i attachments" % len(self.attachments)) if self.attachments else ''
+		return "<%s: 0x%2.2x%s>" % (self.__class__.__name__, self.key, attachments)
 
-
-def to_zip(data, default_name='no-name', deflate=True):
-	"Convert attachments in TNEF data to zip format. Accepts and returns str type."
-	# Parse the TNEF data
-	tnef = TNEF(data)
-	# Convert the TNEF file to an equivalent ZIP file
-	tozip = {}
-	for attachment in tnef.attachments:
-		filename = attachment.name or default_name
-		L = len(tozip.get(filename, []))
-		if L > 0:
-			# uniqify this file name by adding -<num> before the extension
-			root, ext = os.path.splitext(filename)
-			tozip[filename].append((attachment.data, "%s-%d%s" % (root, L + 1, ext)))
-		else:
-			tozip[filename] = [(attachment.data, filename)]
-	# Add each attachment in the TNEF file to the zip file
-	from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
-	from cStringIO import StringIO
-	sfp = StringIO()
-	z = ZipFile(sfp, "w", ZIP_DEFLATED if deflate else ZIP_STORED)
-	with z:
-		for filename, entries in tozip.items():
-			for entry in entries:
-				data, name = entry
-				z.writestr(name, data)
-	# Return the binary data for the zip file
-	return sfp.getvalue()
