@@ -76,20 +76,23 @@ class TNEFMAPI_Object(object):
 					logger.debug("Number of values: %d", num_vals)
 					attr_data = []
 					for j in range(num_vals):
-						# inlined version of bytes_to_int, for performance:
 						if offset + 4 >= dataLen:
 							break
-						length = ord(data[offset]) + (ord(data[offset+1]) << 8) + (ord(data[offset+2]) << 16) + (ord(data[offset+3]) << 24); offset += 4
 						# length = bytes_to_int(data[offset:offset+4]); offset += 4
+						# inlined version of bytes_to_int, for performance:
+						length = ord(data[offset]) + (ord(data[offset+1]) << 8) + (ord(data[offset+2]) << 16) + (ord(data[offset+3]) << 24); offset += 4
 						logger.debug("Length: %d", length)
 						q, r = divmod(length, 4)
 						if r:
 							length += 4 - r
 						logger.debug("Length: %d", length)
 						if attr_type == SZMAPI_UNICODE_STRING:
-							attr_data.append(_parse_null_str(unicode(data[offset:offset+length], 'utf-16'))); offset += length
+							attr_data.append(_parse_null_str(unicode(data[offset:offset+length], 'utf-16')))
+						elif attr_type == SZMAPI_STRING:
+							attr_data.append(_parse_null_str(data[offset:offset+length]))
 						else:
-							attr_data.append(_parse_null_str(data[offset:offset+length])); offset += length
+							attr_data.append(data[offset:offset+length])
+						offset += length
 				else:
 					logger.warn("## Unknown MAPI type 0x%04x", attr_type)
 					logger.warn("Attribute name: 0x%04x", attr_name)
