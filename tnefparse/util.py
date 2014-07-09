@@ -8,16 +8,16 @@ logger = logging.getLogger("tnef-decode")
 # For compatibility, added two versions of bytes_to_int and checksum for now.
 # TODO: refactor?
 
-def bytes_to_int_py3(bytes=None):
+def bytes_to_int_py3(arr=None):
 	"transform multi-byte values into integers, python3 version"
 	# NOTE: byte ordering & signage based on trial and error against tests
-	return int.from_bytes(bytes, byteorder="little", signed=False)
+	return int.from_bytes(arr, byteorder="little", signed=False)
 
-def bytes_to_int_py2(bytes=None):
+def bytes_to_int_py2(arr=None):
 	"transform multi-byte values into integers, python2 version"
 	n = num = 0
-	for b in bytes:
-		num += ( ord(b) << n)
+	for b in arr:
+		num += ord(b) << n
 		n += 8
 	return num
 

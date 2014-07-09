@@ -64,6 +64,8 @@ class TNEFObject(object):
 			self.data = bool(bytes_to_int(self.data))
 		elif self.name in (TNEF.ATTMESSAGEID, TNEF.ATTMESSAGECLASS, TNEF.ATTMESSAGEID, TNEF.ATTSUBJECT, ):
 			self.data = _parse_null_str(self.data)
+		elif self.name in (TNEF.ATTMAPIPROPS, ):
+			pass
 
 	def __str__(self):
 		return "<%s[%s]: %s(0x%04x)=%.70s>" % (self.__class__.__name__, self.length, TNEF.codes.get(self.name), self.name, repr(self.data))
@@ -232,7 +234,7 @@ class TNEF:
 		offset = 6
 		if not do_checksum:
 			logger.info("Skipping checksum for performance")
-		while (offset < len(data)):
+		while offset < len(data):
 			obj = TNEFObject(data[offset: offset+len(data)], do_checksum)
 			offset += obj.length
 			self.objects.append(obj)
