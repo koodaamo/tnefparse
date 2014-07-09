@@ -30,7 +30,7 @@ class TNEFObject(object):
 		if do_checksum:
 			calc_checksum = checksum(self.data)
 			if calc_checksum != att_checksum:
-				logger.warn("Checksum: %s != %s" % (calc_checksum, att_checksum))
+				logger.warn("Checksum: %s != %s", (calc_checksum, att_checksum))
 		else:
 			calc_checksum = att_checksum
 		# whether the checksum is ok
@@ -132,7 +132,7 @@ class TNEFAttachment(object):
 
 
 	def add_attr(self, attribute):
-		logger.debug("Attachment attr name: 0x%4.4x" % attribute.name)
+		logger.debug("Attachment attr name: 0x%4.4x", attribute.name)
 		if attribute.name == TNEF.ATTATTACHMODIFYDATE:
 			logger.debug("No date support yet!")
 		elif attribute.name == TNEF.ATTATTACHMENT:
@@ -142,7 +142,7 @@ class TNEFAttachment(object):
 		elif attribute.name == TNEF.ATTATTACHDATA:
 			self.data = attribute.data
 		else:
-			logger.debug("Unknown attribute name: %s" % attribute)
+			logger.debug("Unknown attribute name: %s", attribute)
 
 	def __str__(self):
 		return "<%s: %s=%s>" % (self.__class__.__name__, self.long_filename(), "")
@@ -255,7 +255,7 @@ class TNEF:
 					elif p.name == TNEFMAPI_Attribute.MAPI_BODY_HTML:
 						self.htmlbody = p.data
 			else:
-				logger.debug("Unknown TNEF Object: %s" % obj)
+				logger.debug("Unknown TNEF Object: %s", obj)
 
 	def has_body(self):
 		return True if (self.body or self.htmlbody) else False
