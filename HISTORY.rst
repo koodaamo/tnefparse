@@ -1,3 +1,8 @@
+tnefparse x.x.x, 201x
+======================
+
+ - use continuous integration service
+
 tnefparse 1.2.1, 2013
 ======================
 
