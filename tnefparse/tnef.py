@@ -1,6 +1,6 @@
 """extracts TNEF encoded content from for example winmail.dat attachments.
 """
-import sys, logging
+import sys, logging, os
 
 logger = logging.getLogger("tnef-decode")
 
