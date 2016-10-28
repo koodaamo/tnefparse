@@ -46,7 +46,10 @@ def tnefparse():
       logging.root.setLevel(level)
 
    for tfp in args.file[0]:
-      t = TNEF(tfp.read(), do_checksum=args.checksum)
+      try:
+         t = TNEF(tfp.read(), do_checksum=args.checksum)
+      except ValueError as exc:
+         sys.exit(exc.message)
       if args.overview:
          print("\nOverview of %s: \n" % tfp.name)
 
