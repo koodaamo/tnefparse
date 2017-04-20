@@ -1,9 +1,9 @@
-tnefparse x.x.x, 201x
+tnefparse 1.2.2, 2017
 ======================
 
- - use continuous integration service
  - have `TNEF` init raise ValueError on invalid TNEF signature, rather than calling sys.exit()
  - `parseFile` convenience function should not expect a `self` parameter, removed
+ - other misc. fixes
 
 tnefparse 1.2.1, 2013
 ======================
