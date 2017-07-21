@@ -2,7 +2,7 @@ tnefparse - TNEF decoding and attachment extraction
 ===================================================
 
 This is a pure-python library for decoding Microsoft's Transport Neutral Encapsulation Format (TNEF), for Python
-versions 2.6 and above.
+versions 2.6 and above. Note that there are some issues with setuptools on Python 3.2, so when using Python3, version 3.3 or above is suggested.
 
 See for example wikipedia for `more on TNEF <http://en.wikipedia.org/wiki/Transport_Neutral_Encapsulation_Format>`_.
 
