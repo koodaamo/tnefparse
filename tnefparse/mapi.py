@@ -3,7 +3,6 @@
 import logging
 from .util import bytes_to_int
 
-logging.basicConfig()
 logger = logging.getLogger("mapi-decode")
 
 SZMAPI_UNSPECIFIED    = 0x0000 # MAPI Unspecified
