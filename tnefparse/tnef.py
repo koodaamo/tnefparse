@@ -99,6 +99,18 @@ class TNEFAttachment(object):
 
       return fn.split('\\')[-1]
 
+   def display_name(self):
+      atname = TNEFMAPI_Attribute.MAPI_DISPLAY_NAME
+      attr = None
+      for a in self.mapi_attrs:
+         if a.name == atname:
+            attr = a
+            break
+      if attr is not None:
+         fn = attr.data[0][:-1]
+      else:
+         fn = self.name
+      return fn
 
    def add_attr(self, attribute):
       logger.debug("Attachment attr name: 0x%4.4x" % attribute.name)
