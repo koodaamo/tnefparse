@@ -93,20 +93,6 @@ class TNEFAttachment(object):
             break
 
       if attr is not None:
-         fn = str(attr.data).replace('0','')
-      else:
-         fn = self.name
-
-      return fn.split('\\')[-1]
-
-   def display_name(self):
-      atname = TNEFMAPI_Attribute.MAPI_DISPLAY_NAME
-      attr = None
-      for a in self.mapi_attrs:
-         if a.name == atname:
-            attr = a
-            break
-      if attr is not None:
          fn = attr.data[0][:-1]
       else:
          fn = self.name
