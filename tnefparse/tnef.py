@@ -93,12 +93,10 @@ class TNEFAttachment(object):
             break
 
       if attr is not None:
-         fn = str(attr.data).replace('0','')
+         fn = attr.data[0][:-1]
       else:
          fn = self.name
-
-      return fn.split('\\')[-1]
-
+      return fn
 
    def add_attr(self, attribute):
       logger.debug("Attachment attr name: 0x%4.4x" % attribute.name)
