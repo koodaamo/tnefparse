@@ -45,3 +45,4 @@ def test_decode(tnefspec):
       # TODO: which encoding should we decode from below?
       assert [a.name.decode() for a in t.attachments] == attchs
 
+      assert [a.long_filename() for a in t.attachments] == attchs
