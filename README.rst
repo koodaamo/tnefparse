@@ -14,6 +14,8 @@ Use 'python setup.py test' or 'python runtests.py' to run the tests.
 
 Please see the HISTORY.txt file for full release notes.
 
+Issues and pull requests welcome. Please however always provide an example TNEF file that can be used to demonstrate the bug or desired behavior, if at all possible.
+
 .. image:: https://badge.fury.io/py/tnefparse.png
     :target: http://badge.fury.io/py/tnefparse
 
