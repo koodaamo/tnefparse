@@ -16,7 +16,7 @@ Please see the HISTORY.txt file for full release notes.
 
 Issues and pull requests welcome. **Please however always provide an example TNEF file** that can be used to demonstrate the bug or desired behavior, if at all possible.
 
-If you have understanding of TNEF and/or MIME internals and want to help with maintaining this package, file an issue or email me. I'd be happy to give you commit rights.
+**If you have understanding of TNEF and/or MIME internals and want to help with maintaining this package, file an issue or email me. I'd be happy to give you commit rights.**
 
 
 .. image:: https://badge.fury.io/py/tnefparse.png
