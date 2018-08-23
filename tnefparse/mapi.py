@@ -1,9 +1,13 @@
 "MAPI attribute definitions"
 
+import sys
 import logging
 from .util import bytes_to_int
 
 logger = logging.getLogger("mapi-decode")
+
+if sys.hexversion < 0x03000000:
+   range = xrange
 
 SZMAPI_UNSPECIFIED    = 0x0000 # MAPI Unspecified
 SZMAPI_NULL           = 0x0001 # MAPI null property
