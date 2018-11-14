@@ -43,6 +43,7 @@ def test_decode(tnefspec):
       assert t.key == key, "wrong key: 0x%2.2x" % t.key
       assert objcodes(t) == objs, "wrong objs: %s" % ["0x%2.2x" % o.name for o in t.objects]
       # TODO: which encoding should we decode from below?
-      assert [a.name.decode() for a in t.attachments] == attchs
 
-      assert [a.long_filename() for a in t.attachments] == attchs
+
+      assert [a.name.decode() for a in t.attachments] == attchs
+      assert [a.long_filename().decode() for a in t.attachments] == attchs
