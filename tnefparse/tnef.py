@@ -25,7 +25,7 @@ class TNEFObject(object):
       if do_checksum:
          calc_checksum = checksum(self.data)
          if calc_checksum != att_checksum:
-            logger.warn("Checksum: %s != %s" % (calc_checksum, att_checksum))
+            logger.warning("Checksum: %s != %s" % (calc_checksum, att_checksum))
       else:
          calc_checksum = att_checksum
 
@@ -230,7 +230,7 @@ class TNEF:
                elif p.name == TNEFMAPI_Attribute.MAPI_BODY_HTML:
                   self.htmlbody = p.data
          else:
-            logger.warn("Unknown TNEF Object: %s" % obj)
+            logger.warning("Unknown TNEF Object: %s" % obj)
 
 
    def has_body(self):
