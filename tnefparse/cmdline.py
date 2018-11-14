@@ -3,8 +3,8 @@ import sys, argparse, logging
 logging.basicConfig()
 logging.root.setLevel(logging.ERROR)
 
-from tnef import TNEF, TNEFAttachment, TNEFObject
-from mapi import TNEFMAPI_Attribute
+from .tnef import TNEF, TNEFAttachment, TNEFObject
+from .mapi import TNEFMAPI_Attribute
 
 
 descr = 'Extract TNEF file contents. Show this help message if no arguments are given.'
