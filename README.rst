@@ -1,6 +1,8 @@
 tnefparse - TNEF decoding and attachment extraction
 ===================================================
 
+**Note: If you have understanding of TNEF and/or MIME internals or just need this package and want to help with maintaining it, let me know. I'd be happy to give you commit rights.**
+
 This is a pure-python library for decoding Microsoft's Transport Neutral Encapsulation Format (TNEF), for Python
 versions 2.6 and above. Note that there are some issues with setuptools on Python 3.2, so when using Python3, version 3.3 or above is suggested.
 
@@ -15,8 +17,6 @@ Use 'python setup.py test' or 'python runtests.py' to run the tests.
 Please see the HISTORY.txt file for full release notes.
 
 Issues and pull requests welcome. **Please however always provide an example TNEF file** that can be used to demonstrate the bug or desired behavior, if at all possible.
-
-**If you have understanding of TNEF and/or MIME internals and want to help with maintaining this package, file an issue or email me. I'd be happy to give you commit rights.**
 
 
 .. image:: https://badge.fury.io/py/tnefparse.png
