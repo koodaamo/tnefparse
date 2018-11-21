@@ -1,5 +1,6 @@
 "MAPI attribute definitions"
 
+import struct
 import sys
 import logging
 from .util import bytes_to_int
@@ -80,9 +81,10 @@ def decode_mapi(data):
 
 #            logger.debug("Number of values: %i" % num_vals)
             attr_data = []
+            unpack_int = struct.Struct('<I').unpack
             for j in range(num_vals):
                # inlined version of bytes_to_int, for performance:
-               length = ord(data[offset]) + (ord(data[offset + 1]) << 8) + (ord(data[offset + 2]) << 16) + (ord(data[offset + 3]) << 24)
+               length = unpack_int(data[offset : offset + 4])[0]
                offset += 4
                q,r = divmod(length, 4)
                if r != 0:
