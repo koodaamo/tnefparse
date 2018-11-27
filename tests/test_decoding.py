@@ -30,7 +30,7 @@ SPECS = (
 # generate tests for all example files
 def pytest_generate_tests(metafunc):
     if "tnefspec" in metafunc.funcargnames:
-        metafunc.parametrize("tnefspec", SPECS)
+        metafunc.parametrize("tnefspec", SPECS, ids=[s[0] for s in SPECS])
 
 
 objnames = lambda t: [TNEF.codes[o.name] for o in t.objects]
