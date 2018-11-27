@@ -124,6 +124,7 @@ class TNEF:
    TNEF_SIGNATURE = 0x223e9f78
    LVL_MESSAGE = 0x01
    LVL_ATTACHMENT = 0x02
+   VALID_VERSION = 0x10000
 
    ATTOWNER                        = 0x0000 # Owner
    ATTSENTFOR                      = 0x0001 # Sent For
@@ -233,6 +234,9 @@ class TNEF:
                elif obj.name == TNEFMAPI_Attribute.MAPI_RTF_COMPRESSED:
                   # TODO Parse RTF
                   self.rtf = obj.data
+         elif obj.name == TNEF.ATTTNEFVERSION:
+             if uint32(obj.data) != TNEF.VALID_VERSION:
+                 logger.warning('Invalid TNEF Version %02x%02x%02x%02x', *obj.data)
          elif obj.name == TNEF.ATTOEMCODEPAGE:
              self.codepage = 'cp%d' % bytes_to_int(obj.data)
              logger.debug('Setting string codepage to %s', self.codepage)
@@ -247,6 +251,12 @@ class TNEF:
    def __str__(self):
       atts = (", %i attachments" % len(self.attachments)) if self.attachments else ''
       return "<%s:0x%2.2x%s>" % (self.__class__.__name__, self.key, atts)
+
+
+def valid_version(data):
+    version = uint32(data)
+    return version == 0x10000
+
 
 def to_zip(data, default_name='no-name', deflate=True):
    "Convert attachments in TNEF data to zip format. Accepts and returns str type."
