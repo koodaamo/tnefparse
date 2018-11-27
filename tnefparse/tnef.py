@@ -83,22 +83,15 @@ class TNEFAttachment(object):
 
    def __init__(self):
       self.mapi_attrs = []
-
+      self.name = b''
+      self.data = b''
 
    def long_filename(self):
       atname = TNEFMAPI_Attribute.MAPI_ATTACH_LONG_FILENAME
-      attr = None
-      for a in self.mapi_attrs:
-         if a.name == atname:
-            attr = a
-            break
-
-      if attr is not None:
-         fn = attr.data[0].rstrip(b'\x00')
-      else:
-         fn = self.name
-
-      return fn
+      name = [a.data for a in self.mapi_attrs if a.name == atname]
+      if name:
+          return name[0][0].rstrip(b'\x00')
+      return self.name
 
 
    def add_attr(self, attribute):

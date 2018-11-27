@@ -3,6 +3,7 @@
 import struct
 import sys
 import logging
+from builtins import str
 from .util import bytes_to_int
 
 logger = logging.getLogger("mapi-decode")
@@ -90,7 +91,11 @@ def decode_mapi(data):
                if r != 0:
                   length += (4-r)
 #               logger.debug("Length: %i" % length)
-               attr_data.append(data[offset:offset+length]); offset += length
+               if attr_type == SZMAPI_UNICODE_STRING:
+                   attr_data.append(str(data[offset:offset+length], 'utf-16').encode('utf-8'))
+               else:
+                   attr_data.append(data[offset:offset+length])
+               offset += length
 
          else:
             logger.debug("## Unknown MAPI type 0x%4.4x" % attr_type)
