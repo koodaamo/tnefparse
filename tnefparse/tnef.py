@@ -1,10 +1,11 @@
 """extracts TNEF encoded content from for example winmail.dat attachments.
 """
-import logging, os
+import os
+import logging
 
 logger = logging.getLogger("tnef-decode")
 
-from .util import bytes_to_int, checksum
+from .util import bytes_to_int, bytes_to_date, checksum, uint32
 from .mapi import TNEFMAPI_Attribute, decode_mapi
 
 
@@ -81,7 +82,8 @@ class TNEFAttachment(object):
       SZMAPI_BEATS_THE_HELL_OUTTA_ME  :  "Unknown"
    }
 
-   def __init__(self):
+   def __init__(self, codepage):
+      self.codepage = codepage
       self.mapi_attrs = []
       self.name = b''
       self.data = b''
@@ -95,15 +97,19 @@ class TNEFAttachment(object):
 
 
    def add_attr(self, attribute):
-      logger.debug("Attachment attr name: 0x%4.4x" % attribute.name)
+#     logger.debug("Attachment attr name: 0x%4.4x" % attribute.name)
       if attribute.name == TNEF.ATTATTACHMODIFYDATE:
-         logger.debug("No date support yet!")
+         self.modification_date = bytes_to_date(attribute.data)
+      elif attribute.name == TNEF.ATTATTACHCREATEDATE:
+         self.creation_date = bytes_to_date(attribute.data)
       elif attribute.name == TNEF.ATTATTACHMENT:
-         self.mapi_attrs += decode_mapi(attribute.data)
+         self.mapi_attrs += decode_mapi(attribute.data, self.codepage)
       elif attribute.name == TNEF.ATTATTACHTITLE:
          self.name = attribute.data.strip(b'\x00')  # remove any NULLs
       elif attribute.name == TNEF.ATTATTACHDATA:
          self.data = attribute.data
+      elif attribute.name == TNEF.ATTATTACHRENDDATA:
+         pass
       else:
          logger.debug("Unknown attribute name: %s" % attribute)
 
@@ -192,6 +198,7 @@ class TNEF:
       if self.signature != TNEF.TNEF_SIGNATURE:
          raise ValueError("Wrong TNEF signature: 0x%2.8x" % self.signature)
       self.key = bytes_to_int(data[4:6])
+      self.codepage = None
       self.objects = []
       self.attachments = []
       self.mapiprops = []
@@ -207,14 +214,15 @@ class TNEF:
 
          # handle attachments
          if obj.name == TNEF.ATTATTACHRENDDATA:
-            attachment = TNEFAttachment()
+            attachment = TNEFAttachment(self.codepage)
             self.attachments.append(attachment)
-         elif obj.level == TNEF.LVL_ATTACHMENT:
+
+         if obj.level == TNEF.LVL_ATTACHMENT:
             attachment.add_attr(obj)
 
          # handle MAPI properties
          elif obj.name == TNEF.ATTMAPIPROPS:
-            self.mapiprops = decode_mapi(obj.data)
+            self.mapiprops = decode_mapi(obj.data, self.codepage)
 
             # handle BODY property
             for p in self.mapiprops:
@@ -222,6 +230,12 @@ class TNEF:
                   self.body = p.data
                elif p.name == TNEFMAPI_Attribute.MAPI_BODY_HTML:
                   self.htmlbody = p.data
+               elif obj.name == TNEFMAPI_Attribute.MAPI_RTF_COMPRESSED:
+                  # TODO Parse RTF
+                  self.rtf = obj.data
+         elif obj.name == TNEF.ATTOEMCODEPAGE:
+             self.codepage = 'cp%d' % bytes_to_int(obj.data)
+             logger.debug('Setting string codepage to %s', self.codepage)
          else:
             logger.warning("Unknown TNEF Object: %s" % obj)
 

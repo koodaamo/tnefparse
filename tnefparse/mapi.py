@@ -1,15 +1,12 @@
 "MAPI attribute definitions"
 
-import struct
 import sys
 import logging
-from builtins import str
-from .util import bytes_to_int
+from builtins import str, range
+from .util import bytes_to_int, uint32
 
 logger = logging.getLogger("mapi-decode")
 
-if sys.hexversion < 0x03000000:
-   range = xrange
 
 SZMAPI_UNSPECIFIED    = 0x0000 # MAPI Unspecified
 SZMAPI_NULL           = 0x0001 # MAPI null property
@@ -31,7 +28,7 @@ SZMAPI_CLSID          = 0x0048 # MAPI OLE GUID
 SZMAPI_BINARY         = 0x0102 # MAPI binary
 SZMAPI_BEATS_THE_HELL_OUTTA_ME = 0x0033
 
-def decode_mapi(data):
+def decode_mapi(data, codepage='cp1252'):
    "decode MAPI types"
 
    dataLen = len(data)
@@ -82,10 +79,9 @@ def decode_mapi(data):
 
 #            logger.debug("Number of values: %i" % num_vals)
             attr_data = []
-            unpack_int = struct.Struct('<I').unpack
             for j in range(num_vals):
                # inlined version of bytes_to_int, for performance:
-               length = unpack_int(data[offset : offset + 4])[0]
+               length = uint32(data[offset : offset + 4])
                offset += 4
                q,r = divmod(length, 4)
                if r != 0:
@@ -93,6 +89,8 @@ def decode_mapi(data):
 #               logger.debug("Length: %i" % length)
                if attr_type == SZMAPI_UNICODE_STRING:
                    attr_data.append(str(data[offset:offset+length], 'utf-16').encode('utf-8'))
+               elif attr_type == SZMAPI_STRING:
+                   attr_data.append(str(data[offset:offset+length], codepage).encode('utf-8'))
                else:
                    attr_data.append(data[offset:offset+length])
                offset += length
