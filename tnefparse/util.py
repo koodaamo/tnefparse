@@ -1,43 +1,49 @@
 """utility functions
 """
 import sys
+import struct
 import logging
+from datetime import datetime
+from builtins import range
 logger = logging.getLogger("tnef-decode")
 
 
-# For compatibility, added two versions of bytes_to_int and checksum for now.
-# TODO: refactor?
+_unint32_unpack = struct.Struct('<I').unpack
+def uint32(byte_arr):
+    return _unint32_unpack(byte_arr)[0]
 
-def bytes_to_int_py3(bytes=None):
+
+_unint16_unpack = struct.Struct('<H').unpack
+def uint16(byte_arr):
+    return _unint16_unpack(byte_arr)[0]
+
+
+def bytes_to_int_py3(byte_arr):
    "transform multi-byte values into integers, python3 version"
-   # NOTE: byte ordering & signage based on trial and error against tests
-   return int.from_bytes(bytes, byteorder="little", signed=False)
+   return int.from_bytes(byte_arr, byteorder="little", signed=False)
 
-def bytes_to_int_py2(bytes=None):
+
+def bytes_to_int_py2(byte_arr):
    "transform multi-byte values into integers, python2 version"
    n = num = 0
-   for b in bytes:
+   for b in byte_arr:
       num += ( ord(b) << n)
       n += 8
    return num
 
-def checksum_py3(data):
-   "calculate a checksum for the TNEF data"
-   # TODO: use int.from_bytes
-   return sum([x for x in data]) & 0xFFFF
-
-def checksum_py2(data):
-   "calculate a checksum for the TNEF data"
-   # NOTE: under Python 3.2+ you can do this much faster with int.from_bytes
-   return sum([ord(x) for x in data]) & 0xFFFF
-
 
 if sys.hexversion > 0x03000000:
   bytes_to_int = bytes_to_int_py3
-  checksum = checksum_py3
 else:
   bytes_to_int = bytes_to_int_py2
-  checksum = checksum_py2
+
+
+def checksum(data):
+    return sum(bytearray(data)) & 0xFFFF
+
+
+def bytes_to_date(byte_arr):
+   return datetime(*[uint16(byte_arr[n:n+2]) for n in range(0, 12, 2)])
 
 
 def raw_mapi(dataLen, data):
