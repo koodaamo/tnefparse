@@ -1,8 +1,9 @@
-import os, sys, logging
+import os, sys, logging, tempfile
 
 logging.basicConfig()
 
 from tnefparse import TNEF
+from tnefparse.tnef import to_zip
 
 datadir = os.path.dirname(os.path.realpath(__file__)) + os.sep + "examples"
 
@@ -56,3 +57,9 @@ def test_decode(tnefspec):
       # assert [a.name.decode() for a in t.attachments] == attchs
 
       # assert objcodes(t) == objs, "wrong objs: %s" % ["0x%2.2x" % o.name for o in t.objects]
+
+def test_zip():
+    with open(datadir + os.sep + 'one-file.tnef', "rb") as tfile:
+        zip_data = to_zip(tfile.read())
+        with tempfile.TemporaryFile() as out:
+            out.write(zip_data)

@@ -2,6 +2,7 @@
 """
 import os
 import logging
+from builtins import str
 
 logger = logging.getLogger("tnef-decode")
 
@@ -118,7 +119,7 @@ class TNEFAttachment(object):
       return "<ATTCH:'%s'>" % self.long_filename()
 
 
-class TNEF:
+class TNEF(object):
    "main decoder class - start by using this"
 
    TNEF_SIGNATURE = 0x223e9f78
@@ -258,7 +259,7 @@ def valid_version(data):
     return version == 0x10000
 
 
-def to_zip(data, default_name='no-name', deflate=True):
+def to_zip(data, default_name=u'no-name', deflate=True):
    "Convert attachments in TNEF data to zip format. Accepts and returns str type."
    # Parse the TNEF data
    tnef = TNEF(data)
@@ -266,22 +267,22 @@ def to_zip(data, default_name='no-name', deflate=True):
    # Convert the TNEF file to an equivalent ZIP file
    tozip = {}
    for attachment in tnef.attachments:
-       filename = attachment.name or default_name
+       filename = attachment.name.decode() or default_name
        L = len(tozip.get(filename, []))
        if L > 0:
            # uniqify this file name by adding -<num> before the extension
            root, ext = os.path.splitext(filename)
-           tozip[filename].append((attachment.data, "%s-%d%s" % (root, L + 1, ext)))
+           tozip[filename].append((attachment.data, str("%s-%d%s" % (root, L + 1, ext))))
        else:
            tozip[filename] = [(attachment.data, filename)]
 
    # Add each attachment in the TNEF file to the zip file
    from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
-   from cStringIO import StringIO
-   sfp = StringIO()
+   from io import BytesIO
+   sfp = BytesIO()
    z = ZipFile(sfp, "w", ZIP_DEFLATED if deflate else ZIP_STORED)
    with z:
-       for filename, entries in tozip.items():
+       for filename, entries in list(tozip.items()):
            for entry in entries:
                data, name = entry
                z.writestr(name, data)
