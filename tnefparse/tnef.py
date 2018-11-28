@@ -242,7 +242,7 @@ class TNEF(object):
              self.codepage = 'cp%d' % bytes_to_int(obj.data)
              logger.debug('Setting string codepage to %s', self.codepage)
          else:
-            logger.warning("Unknown TNEF Object: %s" % obj)
+            logger.debug("Unknown TNEF Object: %s" % obj)
 
 
    def has_body(self):
