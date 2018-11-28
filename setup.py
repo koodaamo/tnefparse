@@ -3,6 +3,12 @@ import sys, os
 
 version = '1.2.3'
 
+with open('README.rst') as readme_file:
+    readme = readme_file.read()
+
+with open('HISTORY.rst') as history_file:
+    history = history_file.read()
+
 class PyTest(Command):
     user_options = []
     def initialize_options(self):
@@ -17,7 +23,7 @@ class PyTest(Command):
 setup(name='tnefparse',
       version=version,
       description="a TNEF decoding library written in python, without external dependencies",
-      long_description="""\n""",
+      long_description=readme + '\n\n' + history,
       classifiers=[
        'Topic :: Communications :: Email',
        'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
