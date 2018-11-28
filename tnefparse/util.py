@@ -4,7 +4,12 @@ import sys
 import struct
 import logging
 from datetime import datetime
-from builtins import range
+
+try:
+    from builtins import range
+except ImportError:
+    from __builtin__ import range
+
 logger = logging.getLogger("tnef-decode")
 
 

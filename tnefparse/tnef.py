@@ -2,7 +2,11 @@
 """
 import os
 import logging
-from builtins import str
+
+try:
+    import builtins
+except ImportError:
+    import __builtin__ as builtins
 
 logger = logging.getLogger("tnef-decode")
 

@@ -2,7 +2,12 @@
 
 import sys
 import logging
-from builtins import str, range
+
+try:
+    from builtins import str, range
+except ImportError:
+    from __builtin__ import str, range
+
 from .util import bytes_to_int, uint32, uint16
 
 logger = logging.getLogger("mapi-decode")
