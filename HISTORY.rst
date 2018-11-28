@@ -1,4 +1,13 @@
 
+tnefparse 1.2.4 (unreleased)
+=============================
+
+ - improved compatibility for both Python 2 & 3
+ - more test examples
+ - parsing improvements
+ - removed some unnecessary warnings
+
+
 tnefparse 1.2.3, 2018-11-14
 ============================
 
