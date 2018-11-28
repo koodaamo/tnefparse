@@ -70,7 +70,7 @@ def decode_mapi(data, codepage='cp1252'):
                     q, r = divmod(iidLen, 4)
                     if r != 0:
                         iidLen += 4 - r
-                    guid_name = str(data[offset : offset + iidLen], 'utf-16')
+                    guid_name = data[offset : offset + iidLen].decode('utf-16')
                     offset += iidLen
 
             num_mv_properties = None
@@ -126,9 +126,9 @@ def parse_property(data, offset, attr_name, attr_type, codepage, is_multi):
             if r != 0:
                 length += 4 - r
             if attr_type == SZMAPI_UNICODE_STRING:
-                attr_data.append(str(data[offset : offset + length], 'utf-16').encode('utf-8'))
+                attr_data.append(data[offset : offset + length].decode('utf-16').encode('utf-8'))
             elif attr_type == SZMAPI_STRING:
-                attr_data.append(str(data[offset : offset + length], codepage).encode('utf-8'))
+                attr_data.append(data[offset : offset + length].decode(codepage).encode('utf-8'))
             else:
                 attr_data.append(data[offset : offset + length])
             offset += length
