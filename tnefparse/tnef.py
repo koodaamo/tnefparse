@@ -3,14 +3,12 @@
 import os
 import logging
 
-try:
-    import builtins
-except ImportError:
-    import __builtin__ as builtins
+from builtins import str
+from future.utils import bord
 
 logger = logging.getLogger("tnef-decode")
 
-from .util import bytes_to_int, bytes_to_date, checksum, uint32
+from .util import bytes_to_int, bytes_to_date, checksum, uint32, uint16
 from .mapi import TNEFMAPI_Attribute, decode_mapi
 
 
@@ -18,13 +16,12 @@ class TNEFObject(object):
    "a TNEF object that may contain a property and an attachment"
 
    def __init__(self, data, do_checksum=False):
-      offset = 0
-      self.level = bytes_to_int(data[offset: offset+1]); offset += 1
-      self.name = bytes_to_int(data[offset:offset+2]); offset += 2
-      self.type = bytes_to_int(data[offset:offset+2]); offset += 2
-      att_length = bytes_to_int(data[offset:offset+4]); offset += 4
+      self.level = bord(data[0]); offset = 1
+      self.name = uint16(data[offset:offset+2]); offset += 2
+      self.type = uint16(data[offset:offset+2]); offset += 2
+      att_length = uint32(data[offset:offset+4]); offset += 4
       self.data = data[offset:offset+att_length]; offset += att_length
-      att_checksum = bytes_to_int(data[offset:offset+2]); offset += 2
+      att_checksum = uint16(data[offset:offset+2]); offset += 2
 
       self.length = offset
 
@@ -38,9 +35,11 @@ class TNEFObject(object):
       # whether the checksum is ok
       self.good_checksum = calc_checksum == att_checksum
 
+   def str_name(self):
+      return TNEF.codes.get(self.name, hex(self.name))
 
    def __str__(self):
-      return "<%s '%s'>" % (self.__class__.__name__, TNEF.codes.get(self.name))
+      return "<%s '%s'>" % (self.__class__.__name__, self.str_name())
 
 
 class TNEFAttachment(object):
@@ -97,8 +96,8 @@ class TNEFAttachment(object):
       atname = TNEFMAPI_Attribute.MAPI_ATTACH_LONG_FILENAME
       name = [a.data for a in self.mapi_attrs if a.name == atname]
       if name:
-          return name[0][0].rstrip(b'\x00')
-      return self.name
+          return name[0]
+      return self.name.decode()
 
 
    def add_attr(self, attribute):
@@ -108,13 +107,16 @@ class TNEFAttachment(object):
       elif attribute.name == TNEF.ATTATTACHCREATEDATE:
          self.creation_date = bytes_to_date(attribute.data)
       elif attribute.name == TNEF.ATTATTACHMENT:
-         self.mapi_attrs += decode_mapi(attribute.data, self.codepage)
+         attrs, off = decode_mapi(attribute.data, self.codepage)
+         self.mapi_attrs = attrs
       elif attribute.name == TNEF.ATTATTACHTITLE:
          self.name = attribute.data.strip(b'\x00')  # remove any NULLs
       elif attribute.name == TNEF.ATTATTACHDATA:
          self.data = attribute.data
       elif attribute.name == TNEF.ATTATTACHRENDDATA:
          pass
+      elif attribute.name == TNEF.ATTATTACHMETAFILE:
+         self.wmf = attribute.data
       else:
          logger.debug("Unknown attribute name: %s" % attribute)
 
@@ -199,6 +201,8 @@ class TNEF(object):
       ATTORIGNINALMESSAGECLASS        :  "Original Message Class"
    }
 
+   MIN_OBJ_SIZE = 12
+
    def __init__(self, data, do_checksum = True):
       self.signature = bytes_to_int(data[0:4])
       if self.signature != TNEF.TNEF_SIGNATURE:
@@ -208,13 +212,16 @@ class TNEF(object):
       self.objects = []
       self.attachments = []
       self.mapiprops = []
+      self.msgprops = []
+      self.body = None
+      self.htmlbody = None
       offset = 6
 
       if not do_checksum:
          logger.info("Skipping checksum for performance")
 
-      while (offset < len(data)):
-         obj = TNEFObject(data[offset: offset+len(data)], do_checksum)
+      while (offset + self.MIN_OBJ_SIZE < len(data)):
+         obj = TNEFObject(data[offset:], do_checksum)
          offset += obj.length
          self.objects.append(obj)
 
@@ -228,25 +235,56 @@ class TNEF(object):
 
          # handle MAPI properties
          elif obj.name == TNEF.ATTMAPIPROPS:
-            self.mapiprops = decode_mapi(obj.data, self.codepage)
+            self.mapiprops, off  = decode_mapi(obj.data, self.codepage)
 
             # handle BODY property
             for p in self.mapiprops:
                if p.name == TNEFMAPI_Attribute.MAPI_BODY:
+                  self.body = p.data
+               elif p.name == TNEFMAPI_Attribute.UNCOMPRESSED_BODY:
                   self.body = p.data
                elif p.name == TNEFMAPI_Attribute.MAPI_BODY_HTML:
                   self.htmlbody = p.data
                elif obj.name == TNEFMAPI_Attribute.MAPI_RTF_COMPRESSED:
                   # TODO Parse RTF
                   self.rtf = obj.data
+         elif obj.name == TNEF.ATTBODY:
+             self.body = obj.data
          elif obj.name == TNEF.ATTTNEFVERSION:
              if uint32(obj.data) != TNEF.VALID_VERSION:
                  logger.warning('Invalid TNEF Version %02x%02x%02x%02x', *obj.data)
          elif obj.name == TNEF.ATTOEMCODEPAGE:
              self.codepage = 'cp%d' % bytes_to_int(obj.data)
-             logger.debug('Setting string codepage to %s', self.codepage)
+             # logger.debug('Setting string codepage to %s', self.codepage)
+         elif obj.name in (TNEF.ATTMESSAGECLASS, TNEF.ATTMESSAGEID, TNEF.ATTSUBJECT, TNEF.ATTPARENTID):
+             obj.data = str(obj.data, self.codepage)
+             self.msgprops.append(obj)
+         elif obj.name == TNEF.ATTPRIORITY:
+             obj.data = 3 - uint16(obj.data)
+             self.msgprops.append(obj)
+         elif obj.name == TNEF.ATTRECIPTABLE:
+             rows = uint32(obj.data[0:4]); o2 = 4
+             self.recipients = []
+             for r in range(rows):
+                recipients, o2 = decode_mapi(obj.data[o2:], self.codepage)
+                self.recipients += recipients
+         elif obj.name == TNEF.ATTFROM:
+             obj.data = triples(obj.data)
+             self.msgprops.append(obj)
+         elif obj.name == TNEF.ATTREQUESTRES:
+             obj.data = bool(uint16(obj.data))
+             self.msgprops.append(obj)
+         elif obj.name == TNEF.ATTMESSAGESTATUS:
+             obj.data = bytes_to_int(obj.data)
+             self.msgprops.append(obj)
+         elif obj.name in (TNEF.ATTDATESTART, TNEF.ATTDATEMODIFY, TNEF.ATTDATESENT, TNEF.ATTDATERECD):
+             try:
+                obj.data = bytes_to_date(obj.data)
+                self.msgprops.append(obj)
+             except ValueError:
+                pass
          else:
-            logger.debug("Unknown TNEF Object: %s" % obj)
+            logger.debug("Unhandled TNEF Object: %s" % obj)
 
 
    def has_body(self):
@@ -261,6 +299,15 @@ class TNEF(object):
 def valid_version(data):
     version = uint32(data)
     return version == 0x10000
+
+def triples(data):
+    assert uint16(data[0:2]) == 4; o = 2
+    struct_length = uint16(data[o:o+2]); o+=2
+    sender_length = uint16(data[o:o+2]); o+=2
+    email_length = uint16(data[o:o+2]); o+=2
+    sender = data[o:o+sender_length]; o+=sender_length
+    email = data[o:o+email_length]; o+=email_length
+    return sender.rstrip(b'\x00'), email.rstrip(b'\x00')
 
 
 def to_zip(data, default_name=u'no-name', deflate=True):

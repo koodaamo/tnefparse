@@ -99,7 +99,7 @@ def decode_mapi(data, codepage='cp1252'):
         logger.error('decode_mapi Exception %s' % e)
         logger.debug(stack)
 
-    return attrs
+    return (attrs, offset)
 
 
 def parse_property(data, offset, attr_name, attr_type, codepage, is_multi):
@@ -571,13 +571,16 @@ class TNEFMAPI_Attribute(object):
 
     UNCOMPRESSED_BODY = 0x3FD9
 
-    PID_TAG_INTERNET_REFERENCES = 0x1039
+    PID_TAG_PRIMARY_SEND_ACCOUNT = 0X0E28
+    PID_TAG_NEXT_SEND_ACCT = 0X0E29
+    PID_TAG_INTERNET_REFERENCES = 0X1039
     PID_TAG_IN_REPLY_TO_ID = 0x1042
     PID_TAG_INTERNET_RETURN_PATH = 0x1046
     PID_TAG_ICON_INDEX = 0x1080
     PID_TAG_TARGET_ENTRY_ID = 0x3010
     PID_TAG_CONVERSATION_ID = 0x3013
 
+    PID_TAG_STORE_UNICODE_MASK = 0X340F
     PID_TAG_INTERNET_CODEPAGE = 0x3FDE
     PID_TAG_MESSAGE_LOCALE_ID = 0x3FF1
     PID_TAG_CREATOR_NAME = 0x3FF8
@@ -1031,12 +1034,15 @@ class TNEFMAPI_Attribute(object):
         MAPI_CONTROL_ID: "MAPI_CONTROL_ID",
         MAPI_INITIAL_DETAILS_PANE: "MAPI_INITIAL_DETAILS_PANE",
         UNCOMPRESSED_BODY: "UNCOMPRESSED_BODY",
+        PID_TAG_PRIMARY_SEND_ACCOUNT: "PID_TAG_PRIMARY_SEND_ACCOUNT",
+        PID_TAG_NEXT_SEND_ACCT: "PID_TAG_NEXT_SEND_ACCT",
         PID_TAG_INTERNET_REFERENCES: "PID_TAG_INTERNET_REFERENCES",
         PID_TAG_IN_REPLY_TO_ID: "PID_TAG_IN_REPLY_TO_ID",
         PID_TAG_INTERNET_RETURN_PATH: "PID_TAG_INTERNET_RETURN_PATH",
         PID_TAG_ICON_INDEX: "PID_TAG_ICON_INDEX",
         PID_TAG_TARGET_ENTRY_ID: "PID_TAG_TARGET_ENTRY_ID",
         PID_TAG_CONVERSATION_ID: "PID_TAG_CONVERSATION_ID",
+        PID_TAG_STORE_UNICODE_MASK: "PID_TAG_STORE_UNICODE_MASK",
         PID_TAG_INTERNET_CODEPAGE: "PID_TAG_INTERNET_CODEPAGE",
         PID_TAG_MESSAGE_LOCALE_ID: "PID_TAG_MESSAGE_LOCALE_ID",
         PID_TAG_CREATOR_NAME: "PID_TAG_CREATOR_NAME",
@@ -1067,10 +1073,31 @@ class TNEFMAPI_Attribute(object):
     def __init__(self, attr_type, name, data, guid, guid_name=None, guid_prop=None):
         self.attr_type = attr_type
         self.name = name
-        self.data = data
+        self.raw_data = data
         self.guid = guid
         self.guid_name = guid_name
         self.guid_prop = guid_prop
+
+    @property
+    def data(self):
+        if self.attr_type == SZMAPI_SHORT:
+            return uint16(self.raw_data)
+        elif self.attr_type == SZMAPI_BOOLEAN:
+            return bool(uint16(self.raw_data))
+        elif self.attr_type == SZMAPI_INT:
+            # TODO: signed
+            return uint32(self.raw_data)
+        elif self.attr_type == SZMAPI_FLOAT:
+            return struct.unpack('f', self.raw_data)[0]
+        elif self.attr_type in (SZMAPI_STRING, SZMAPI_UNICODE_STRING, SZMAPI_BINARY):
+            binary = b''.join([s.rstrip(b'\x00') for s in self.raw_data])
+            if self.attr_type == SZMAPI_BINARY:
+                return binary
+            else:
+                return binary.decode('utf-8')
+        else:
+            # TODO: SZMAPI_DOUBLE, SZMAPI_APPTIME, SZMAPI_CURRENCY SZMAPI_INT8BYTE, SZMAPI_SYSTIME, SZMAPI_CLSID, SZMAPI_ERROR
+            return self.raw_data
 
     def __str__(self):
         aname = self.guid_name

@@ -37,6 +37,7 @@ SPECS = (
    ("triples.tnef", 0xea64, [], []),
    ("unicode-mapi-attr-name.tnef", 0x69ec, ['spaconsole2.cfg', 'image001.png', 'image002.png', 'image003.png'], []),
    ("unicode-mapi-attr.tnef", 0x408f, ['example.dat'], []),
+   ("tzanke.tnef", 0xa2e, ['TBZ PARIV GmbH.jpg', 'image003.jpg', u'UmlautAnhang-\xe4\xfc\xf6.txt'], []),
 )
 
 # generate tests for all example files
@@ -53,8 +54,13 @@ def test_decode(tnefspec):
    with open(datadir + os.sep + fn, "rb") as tfile:
       t = TNEF(tfile.read())
       assert t.key == key, "wrong key: 0x%2.2x" % t.key
-      assert [a.long_filename().decode() for a in t.attachments] == attchs
-      # assert [a.name.decode() for a in t.attachments] == attchs
+      assert [a.long_filename() for a in t.attachments] == attchs
+      for m in t.mapiprops:
+          assert m.data is not None
+      if t.htmlbody:
+          assert b'html' in t.htmlbody
+
+      # assert [a.name.decode() for a in t.attachments] == [to_shortname(a) for a in attchs]
 
       # assert objcodes(t) == objs, "wrong objs: %s" % ["0x%2.2x" % o.name for o in t.objects]
 
@@ -63,3 +69,11 @@ def test_zip():
         zip_data = to_zip(tfile.read())
         with tempfile.TemporaryFile() as out:
             out.write(zip_data)
+
+
+def to_shortname(longname):
+    if len(longname) < 15:
+        return longname
+    root, ext = os.path.splitext(longname)
+    strip = len(ext)
+    return root.upper()[0:10-strip] + '~1' + ext.upper()
