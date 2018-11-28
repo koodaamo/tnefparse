@@ -279,9 +279,10 @@ def to_zip(data, default_name=u'no-name', deflate=True):
    # Add each attachment in the TNEF file to the zip file
    from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
    from io import BytesIO
+   import contextlib
    sfp = BytesIO()
-   z = ZipFile(sfp, "w", ZIP_DEFLATED if deflate else ZIP_STORED)
-   with z:
+   zf = ZipFile(sfp, "w", ZIP_DEFLATED if deflate else ZIP_STORED)
+   with contextlib.closing(zf) as z:
        for filename, entries in list(tozip.items()):
            for entry in entries:
                data, name = entry
