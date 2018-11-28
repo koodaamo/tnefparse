@@ -18,6 +18,7 @@ Please see the HISTORY.txt file for full release notes.
 
 Issues and pull requests welcome. **Please however always provide an example TNEF file** that can be used to demonstrate the bug or desired behavior, if at all possible.
 
+For Reference see: https://interoperability.blob.core.windows.net/files/MS-OXTNEF/[MS-OXTNEF].pdf
 
 .. image:: https://badge.fury.io/py/tnefparse.png
     :target: http://badge.fury.io/py/tnefparse

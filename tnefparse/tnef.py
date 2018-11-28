@@ -1,10 +1,12 @@
 """extracts TNEF encoded content from for example winmail.dat attachments.
 """
-import logging, os
+import os
+import logging
+from builtins import str
 
 logger = logging.getLogger("tnef-decode")
 
-from .util import bytes_to_int, checksum
+from .util import bytes_to_int, bytes_to_date, checksum, uint32
 from .mapi import TNEFMAPI_Attribute, decode_mapi
 
 
@@ -81,36 +83,34 @@ class TNEFAttachment(object):
       SZMAPI_BEATS_THE_HELL_OUTTA_ME  :  "Unknown"
    }
 
-   def __init__(self):
+   def __init__(self, codepage):
+      self.codepage = codepage
       self.mapi_attrs = []
-
+      self.name = b''
+      self.data = b''
 
    def long_filename(self):
       atname = TNEFMAPI_Attribute.MAPI_ATTACH_LONG_FILENAME
-      attr = None
-      for a in self.mapi_attrs:
-         if a.name == atname:
-            attr = a
-            break
-
-      if attr is not None:
-         fn = attr.data[0].rstrip(b'\x00')
-      else:
-         fn = self.name
-
-      return fn
+      name = [a.data for a in self.mapi_attrs if a.name == atname]
+      if name:
+          return name[0][0].rstrip(b'\x00')
+      return self.name
 
 
    def add_attr(self, attribute):
-      logger.debug("Attachment attr name: 0x%4.4x" % attribute.name)
+#     logger.debug("Attachment attr name: 0x%4.4x" % attribute.name)
       if attribute.name == TNEF.ATTATTACHMODIFYDATE:
-         logger.debug("No date support yet!")
+         self.modification_date = bytes_to_date(attribute.data)
+      elif attribute.name == TNEF.ATTATTACHCREATEDATE:
+         self.creation_date = bytes_to_date(attribute.data)
       elif attribute.name == TNEF.ATTATTACHMENT:
-         self.mapi_attrs += decode_mapi(attribute.data)
+         self.mapi_attrs += decode_mapi(attribute.data, self.codepage)
       elif attribute.name == TNEF.ATTATTACHTITLE:
          self.name = attribute.data.strip(b'\x00')  # remove any NULLs
       elif attribute.name == TNEF.ATTATTACHDATA:
          self.data = attribute.data
+      elif attribute.name == TNEF.ATTATTACHRENDDATA:
+         pass
       else:
          logger.debug("Unknown attribute name: %s" % attribute)
 
@@ -119,12 +119,13 @@ class TNEFAttachment(object):
       return "<ATTCH:'%s'>" % self.long_filename()
 
 
-class TNEF:
+class TNEF(object):
    "main decoder class - start by using this"
 
    TNEF_SIGNATURE = 0x223e9f78
    LVL_MESSAGE = 0x01
    LVL_ATTACHMENT = 0x02
+   VALID_VERSION = 0x10000
 
    ATTOWNER                        = 0x0000 # Owner
    ATTSENTFOR                      = 0x0001 # Sent For
@@ -199,6 +200,7 @@ class TNEF:
       if self.signature != TNEF.TNEF_SIGNATURE:
          raise ValueError("Wrong TNEF signature: 0x%2.8x" % self.signature)
       self.key = bytes_to_int(data[4:6])
+      self.codepage = None
       self.objects = []
       self.attachments = []
       self.mapiprops = []
@@ -214,14 +216,15 @@ class TNEF:
 
          # handle attachments
          if obj.name == TNEF.ATTATTACHRENDDATA:
-            attachment = TNEFAttachment()
+            attachment = TNEFAttachment(self.codepage)
             self.attachments.append(attachment)
-         elif obj.level == TNEF.LVL_ATTACHMENT:
+
+         if obj.level == TNEF.LVL_ATTACHMENT:
             attachment.add_attr(obj)
 
          # handle MAPI properties
          elif obj.name == TNEF.ATTMAPIPROPS:
-            self.mapiprops = decode_mapi(obj.data)
+            self.mapiprops = decode_mapi(obj.data, self.codepage)
 
             # handle BODY property
             for p in self.mapiprops:
@@ -229,6 +232,15 @@ class TNEF:
                   self.body = p.data
                elif p.name == TNEFMAPI_Attribute.MAPI_BODY_HTML:
                   self.htmlbody = p.data
+               elif obj.name == TNEFMAPI_Attribute.MAPI_RTF_COMPRESSED:
+                  # TODO Parse RTF
+                  self.rtf = obj.data
+         elif obj.name == TNEF.ATTTNEFVERSION:
+             if uint32(obj.data) != TNEF.VALID_VERSION:
+                 logger.warning('Invalid TNEF Version %02x%02x%02x%02x', *obj.data)
+         elif obj.name == TNEF.ATTOEMCODEPAGE:
+             self.codepage = 'cp%d' % bytes_to_int(obj.data)
+             logger.debug('Setting string codepage to %s', self.codepage)
          else:
             logger.warning("Unknown TNEF Object: %s" % obj)
 
@@ -241,7 +253,13 @@ class TNEF:
       atts = (", %i attachments" % len(self.attachments)) if self.attachments else ''
       return "<%s:0x%2.2x%s>" % (self.__class__.__name__, self.key, atts)
 
-def to_zip(data, default_name='no-name', deflate=True):
+
+def valid_version(data):
+    version = uint32(data)
+    return version == 0x10000
+
+
+def to_zip(data, default_name=u'no-name', deflate=True):
    "Convert attachments in TNEF data to zip format. Accepts and returns str type."
    # Parse the TNEF data
    tnef = TNEF(data)
@@ -249,22 +267,23 @@ def to_zip(data, default_name='no-name', deflate=True):
    # Convert the TNEF file to an equivalent ZIP file
    tozip = {}
    for attachment in tnef.attachments:
-       filename = attachment.name or default_name
+       filename = attachment.name.decode() or default_name
        L = len(tozip.get(filename, []))
        if L > 0:
            # uniqify this file name by adding -<num> before the extension
            root, ext = os.path.splitext(filename)
-           tozip[filename].append((attachment.data, "%s-%d%s" % (root, L + 1, ext)))
+           tozip[filename].append((attachment.data, str("%s-%d%s" % (root, L + 1, ext))))
        else:
            tozip[filename] = [(attachment.data, filename)]
 
    # Add each attachment in the TNEF file to the zip file
    from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
-   from cStringIO import StringIO
-   sfp = StringIO()
-   z = ZipFile(sfp, "w", ZIP_DEFLATED if deflate else ZIP_STORED)
-   with z:
-       for filename, entries in tozip.items():
+   from io import BytesIO
+   import contextlib
+   sfp = BytesIO()
+   zf = ZipFile(sfp, "w", ZIP_DEFLATED if deflate else ZIP_STORED)
+   with contextlib.closing(zf) as z:
+       for filename, entries in list(tozip.items()):
            for entry in entries:
                data, name = entry
                z.writestr(name, data)
