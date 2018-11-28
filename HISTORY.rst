@@ -3,8 +3,8 @@ tnefparse 1.2.4 (unreleased)
 =============================
 
  - improved compatibility for both Python 2 & 3
- - more test examples
- - parsing improvements
+ - more test examples (jrideout)
+ - parsing improvements (jrideout)
  - removed some unnecessary warnings
 
 
