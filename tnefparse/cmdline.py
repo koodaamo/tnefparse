@@ -56,7 +56,7 @@ def tnefparse():
          # list TNEF attachments
          print("  Attachments:\n")
          for a in t.attachments:
-            print("    " + a.name)
+            print("    " + a.name.decode("utf-8"))
 
          # list TNEF objects
          print("\n  Objects:\n")
