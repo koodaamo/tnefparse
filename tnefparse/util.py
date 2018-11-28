@@ -5,10 +5,8 @@ import struct
 import logging
 from datetime import datetime
 
-try:
-    from builtins import range
-except ImportError:
-    from __builtin__ import range
+if sys.hexversion < 0x03000000:
+   range = xrange
 
 logger = logging.getLogger("tnef-decode")
 

@@ -3,11 +3,6 @@
 import os
 import logging
 
-try:
-    import builtins
-except ImportError:
-    import __builtin__ as builtins
-
 logger = logging.getLogger("tnef-decode")
 
 from .util import bytes_to_int, bytes_to_date, checksum, uint32

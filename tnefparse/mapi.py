@@ -3,12 +3,10 @@
 import sys
 import logging
 
-try:
-    from builtins import str, range
-except ImportError:
-    from __builtin__ import str, range
-
 from .util import bytes_to_int, uint32, uint16
+
+if sys.hexversion < 0x03000000:
+   range = xrange
 
 logger = logging.getLogger("mapi-decode")
 
