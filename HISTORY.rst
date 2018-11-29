@@ -6,7 +6,7 @@ tnefparse 1.2.4 (unreleased)
  - more test examples (jrideout)
  - parsing improvements (jrideout)
  - removed some unnecessary warnings
-
+ - drop Python 2.6 support
 
 tnefparse 1.2.3, 2018-11-14
 ============================
