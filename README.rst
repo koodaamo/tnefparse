@@ -9,9 +9,9 @@ is also available as a `PDF download <https://interoperability.blob.core.windows
 
 The library can be used as a basis for applications that need to parse TNEF. To parse a file into a TNEF object, run eg. :
 
-  >>> from tnefparse import TNEF
-  >>> with open("tests/examples/one-file.tnef", "rb") as tneffile:
-  ...    tnefobj = TNEF(tneffile.read())
+ >>> from tnefparse import TNEF
+ >>> with open("tests/examples/one-file.tnef", "rb") as tneffile:
+ ...    tnefobj = TNEF(tneffile.read())
 
 A or :code:`tnefparse` command-line utility is also provided for listing contents of TNEF files, extracting attachments found inside them and so on.
 
