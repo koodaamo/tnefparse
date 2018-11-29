@@ -9,17 +9,6 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-class PyTest(Command):
-    user_options = []
-    def initialize_options(self):
-        pass
-    def finalize_options(self):
-        pass
-    def run(self):
-        import sys,subprocess
-        errno = subprocess.call([sys.executable, 'runtests.py'])
-        raise SystemExit(errno)
-
 setup(name='tnefparse',
       version=version,
       description="a TNEF decoding library written in python, without external dependencies",
@@ -43,10 +32,11 @@ setup(name='tnefparse',
       url='https://github.com/koodaamo/tnefparse',
       license='LGPL',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
+      setup_requires=["pytest-runner"],
+      tests_require = ['pytest', 'coverage'],
       include_package_data=True,
       zip_safe=True,
       entry_points = {
          'console_scripts': ['tnefparse = tnefparse.cmdline:tnefparse']
-      },
-      cmdclass = {'test': PyTest},
-      )
+      }
+)
