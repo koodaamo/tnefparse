@@ -15,7 +15,7 @@ install:
 
 script:
   - python setup.py test
-  - coverage report
+  - coverage report --include=tests/*
 
 after_success:
   - codecov
