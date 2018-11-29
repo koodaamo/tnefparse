@@ -11,10 +11,11 @@ python:
   - "pypy"
 
 install:
-  - pip install pytest pytest-cov codecov
+  - pip install codecov coverage
 
 script:
-  - pytest --cov=./tests/
+  - python setup.py test
+  - coverage report
 
 after_success:
   - codecov
