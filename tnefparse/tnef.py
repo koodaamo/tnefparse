@@ -194,6 +194,8 @@ class TNEF(object):
       ATTORIGNINALMESSAGECLASS        :  "Original Message Class"
    }
 
+   MIN_OBJ_SIZE = 12
+
    def __init__(self, data, do_checksum = True):
       self.signature = bytes_to_int(data[0:4])
       if self.signature != TNEF.TNEF_SIGNATURE:
@@ -203,13 +205,16 @@ class TNEF(object):
       self.objects = []
       self.attachments = []
       self.mapiprops = []
+      self.body = None
+      self.htmlbody = None
+      self.rtfbody = None
       offset = 6
 
       if not do_checksum:
          logger.info("Skipping checksum for performance")
 
-      while (offset < len(data)):
-         obj = TNEFObject(data[offset: offset+len(data)], do_checksum)
+      while (offset + self.MIN_OBJ_SIZE < len(data)):
+         obj = TNEFObject(data[offset:], do_checksum)
          offset += obj.length
          self.objects.append(obj)
 
@@ -229,11 +234,14 @@ class TNEF(object):
             for p in self.mapiprops:
                if p.name == TNEFMAPI_Attribute.MAPI_BODY:
                   self.body = p.data
+               elif p.name == TNEFMAPI_Attribute.UNCOMPRESSED_BODY:
+                  self.body = p.data
                elif p.name == TNEFMAPI_Attribute.MAPI_BODY_HTML:
                   self.htmlbody = p.data
-               elif obj.name == TNEFMAPI_Attribute.MAPI_RTF_COMPRESSED:
-                  # TODO Parse RTF
-                  self.rtf = obj.data
+               elif p.name == TNEFMAPI_Attribute.MAPI_RTF_COMPRESSED:
+                  self.rtfbody = p.data
+         elif obj.name == TNEF.ATTBODY:
+             self.body = obj.data
          elif obj.name == TNEF.ATTTNEFVERSION:
              if uint32(obj.data) != TNEF.VALID_VERSION:
                  logger.warning('Invalid TNEF Version %02x%02x%02x%02x', *obj.data)
@@ -245,7 +253,7 @@ class TNEF(object):
 
 
    def has_body(self):
-      return True if (self.body or self.htmlbody) else False
+      return True if (self.body or self.htmlbody or self.rtfbody) else False
 
 
    def __str__(self):
