@@ -7,8 +7,9 @@ versions 2.7, 3.5+ and PyPy.
 For more information on TNEF, see for example `wikipedia <http://en.wikipedia.org/wiki/Transport_Neutral_Encapsulation_Format>`_. The full TNEF specification
 is also available as a `PDF download <https://interoperability.blob.core.windows.net/files/MS-OXTNEF/[MS-OXTNEF].pdf>`_.
 
-The library can be used as a basis for applications that need to parse TNEF. To parse a file into a TNEF object, run eg. ::
+The library can be used as a basis for applications that need to parse TNEF. To parse a file into a TNEF object, run eg. :
 
+  >>> from tnefparse import TNEF
   >>> with open("tests/examples/one-file.tnef", "rb") as tneffile:
   ...    tnefobj = TNEF(tneffile.read())
 
@@ -25,3 +26,5 @@ Issues and pull requests welcome. **Please however always provide an example TNE
 
 .. image:: https://travis-ci.org/koodaamo/tnefparse.png?branch=master
         :target: https://travis-ci.org/koodaamo/tnefparse
+
+.. highlight:: python
