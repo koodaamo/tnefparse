@@ -1,4 +1,4 @@
-import sys, argparse, logging
+import os, sys, argparse, logging
 
 logging.basicConfig()
 logging.root.setLevel(logging.ERROR)
@@ -15,10 +15,13 @@ argument('file', type=argparse.FileType('rb'), nargs='+', action="append",
          help='space-separated list of paths to the TNEF files')
 
 argument('-o','--overview', action='store_true',
-         help='show long debug overview of TNEF file contents')
+         help='show (possibly long) overview of TNEF file contents')
 
 argument('-a','--attachments', action='store_true',
-         help='extract attachments to current directory')
+         help='extract attachments, by default to current dir')
+
+argument('-p','--path',
+         help='optional explicit path to extract attachments to')
 
 argument('-b', '--body', action='store_true', help='extract the body to stdout')
 
@@ -72,8 +75,9 @@ def tnefparse():
          print("")
 
       elif args.attachments:
+         pth = args.path.rstrip(os.sep) + os.sep if args.path else ''
          for a in t.attachments:
-            with open(a.name, "wb") as afp:
+            with open(pth + a.name.decode('utf-8'), "wb") as afp:
                afp.write(a.data)
          sys.exit("Successfully wrote %i files" % len(t.attachments))
 
