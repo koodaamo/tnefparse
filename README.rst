@@ -13,7 +13,7 @@ The library can be used as a basis for applications that need to parse TNEF. To 
  >>> with open("tests/examples/one-file.tnef", "rb") as tneffile:
  ...    tnefobj = TNEF(tneffile.read())
 
-A or :code:`tnefparse` command-line utility is also provided for listing contents of TNEF files, extracting attachments found inside them and so on.
+A :code:`tnefparse` command-line utility is also provided for listing contents of TNEF files, extracting attachments found inside them and so on.
 
 Use :code:`python setup.py test` or :code:`python runtests.py` to run the tests.
 
