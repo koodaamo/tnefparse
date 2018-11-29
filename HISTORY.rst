@@ -1,13 +1,15 @@
 
-tnefparse 1.2.4 (unreleased)
+tnefparse 1.3 (unreleased)
 =============================
 
  - improved compatibility for both Python 2 & 3
  - more test examples (jrideout)
- - parsing improvements (jrideout)
+ - lots of parsing improvements (jrideout)
  - removed some unnecessary warnings
  - drop Python 2.6 support
  - drop Python 3.3 support, recommend 3.5+
+ - add tnefparse -p | --path option for setting explicit output path
+ - better testing
 
 tnefparse 1.2.3, 2018-11-14
 ============================
