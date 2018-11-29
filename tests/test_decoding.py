@@ -52,19 +52,19 @@ objnames = lambda t: [TNEF.codes[o.name] for o in t.objects]
 objcodes = lambda t: [o.name for o in t.objects]
 
 def test_decode(tnefspec):
-   fn, key, attchs, body, objs = tnefspec
-   with open(datadir + os.sep + fn, "rb") as tfile:
-      t = TNEF(tfile.read())
-      assert t.key == key, "wrong key: 0x%2.2x" % t.key
-      assert [a.long_filename().decode() for a in t.attachments] == attchs
-      for m in t.mapiprops:
-          assert m.data is not None
+    fn, key, attchs, body, objs = tnefspec
+    with open(datadir + os.sep + fn, "rb") as tfile:
+        t = TNEF(tfile.read())
+        assert t.key == key, "wrong key: 0x%2.2x" % t.key
+        assert [a.long_filename().decode() for a in t.attachments] == attchs
+        for m in t.mapiprops:
+            assert m.data is not None
 
-      if body:
-          assert getattr(t, body)
+        if body:
+            assert getattr(t, body)
 
-      if objs:
-          assert objcodes(t) == objs, "wrong objs: %s" % ["0x%2.2x" % o.name for o in t.objects]
+        if objs:
+            assert objcodes(t) == objs, "wrong objs: %s" % ["0x%2.2x" % o.name for o in t.objects]
 
 def test_zip():
     with open(datadir + os.sep + 'one-file.tnef', "rb") as tfile:

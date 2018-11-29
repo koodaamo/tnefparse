@@ -3,11 +3,6 @@
 import os
 import logging
 
-try:
-    import builtins
-except ImportError:
-    import __builtin__ as builtins
-
 logger = logging.getLogger("tnef-decode")
 
 from .util import bytes_to_int, bytes_to_date, checksum, uint32
@@ -97,8 +92,8 @@ class TNEFAttachment(object):
       atname = TNEFMAPI_Attribute.MAPI_ATTACH_LONG_FILENAME
       name = [a.data for a in self.mapi_attrs if a.name == atname]
       if name:
-          return name[0][0].rstrip(b'\x00')
-      return self.name
+          return name[0]
+      return self.name.decode()
 
 
    def add_attr(self, attribute):

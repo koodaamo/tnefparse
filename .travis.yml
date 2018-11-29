@@ -5,9 +5,16 @@ language: python
 python:
   - "3.6"
   - "3.5"
-  - "3.3"
+  - "3.4"
   - "2.7"
-  - "2.6"
   - "pypy"
 
-script: python setup.py test
+install:
+  - pip install -e .
+  - pip install pytest pytest-cov codecov
+
+script:
+  - pytest --cov
+
+after_success:
+  - codecov
