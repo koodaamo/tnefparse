@@ -7,16 +7,18 @@ versions 2.7, 3.5+ and PyPy.
 For more information on TNEF, see for example `wikipedia <http://en.wikipedia.org/wiki/Transport_Neutral_Encapsulation_Format>`_. The full TNEF specification
 is also available as a `PDF download <https://interoperability.blob.core.windows.net/files/MS-OXTNEF/[MS-OXTNEF].pdf>`_.
 
-The library can be used as a basis for applications that need to parse TNEF. A command-line utility "tnefparse" is
-also provided that gets installed as part of the package, that can be used to list contents of TNEF files and
-extract attachments found inside them.
+The library can be used as a basis for applications that need to parse TNEF. To parse a file into a TNEF object, run eg. ::
 
-Use 'python setup.py test' or 'python runtests.py' to run the tests.
+  >>> with open("tests/examples/one-file.tnef", "rb") as tneffile:
+  ...    tnefobj = TNEF(tneffile.read())
+
+A or :code:`tnefparse` command-line utility is also provided for listing contents of TNEF files, extracting attachments found inside them and so on.
+
+Use :code:`python setup.py test` or :code:`python runtests.py` to run the tests.
 
 Issues and pull requests welcome. **Please however always provide an example TNEF file** that can be used to demonstrate the bug or desired behavior, if at all possible.
 
-**Note: If you have understanding of TNEF and/or MIME internals or just need this package and want to help with maintaining it, I am open
-to giving you commit rights. Just let me know.**
+**Note: If you have understanding of TNEF and/or MIME internals or just need this package and want to help with maintaining it, I am open to giving you commit rights. Just let me know.**
 
 .. image:: https://badge.fury.io/py/tnefparse.png
     :target: http://badge.fury.io/py/tnefparse
