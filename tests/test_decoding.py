@@ -56,7 +56,7 @@ def test_decode(tnefspec):
     with open(datadir + os.sep + fn, "rb") as tfile:
         t = TNEF(tfile.read())
         assert t.key == key, "wrong key: 0x%2.2x" % t.key
-        assert [a.long_filename().decode() for a in t.attachments] == attchs
+        assert [a.long_filename() for a in t.attachments] == attchs
         for m in t.mapiprops:
             assert m.data is not None
 
