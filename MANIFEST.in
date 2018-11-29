@@ -1,0 +1,7 @@
+include *.rst
+include *.txt
+include .coveragerc
+include LICENSE
+include tox.ini
+recursive-include tests *.py
+recursive-include tests *.tnef
