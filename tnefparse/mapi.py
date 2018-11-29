@@ -2,8 +2,10 @@
 
 import sys
 import logging
-
-from .util import bytes_to_int, uint32, uint16
+from decimal import Decimal
+from .util import (bytes_to_int, uint8, int8, uint16, int16,
+                   uint32, int32, uint64, int64, float32, dbl64,
+                   guid, systime, apptime)
 
 if sys.hexversion < 0x03000000:
    range = xrange
@@ -1065,10 +1067,47 @@ class TNEFMAPI_Attribute(object):
     def __init__(self, attr_type, name, data, guid, guid_name=None, guid_prop=None):
         self.attr_type = attr_type
         self.name = name
-        self.data = data
+        self.raw_data = data
         self.guid = guid
         self.guid_name = guid_name
         self.guid_prop = guid_prop
+        if self.guid_name:
+            self.guid_name = self.guid_name.rstrip('\x00')
+
+    @property
+    def data(self):
+        if self.attr_type == SZMAPI_NULL:
+            return None
+        elif self.attr_type == SZMAPI_SHORT:
+            return int16(self.raw_data)
+        elif self.attr_type == SZMAPI_INT:
+            return int32(self.raw_data)
+        elif self.attr_type == SZMAPI_FLOAT:
+            return float32(self.raw_data)
+        elif self.attr_type == SZMAPI_DOUBLE:
+            return dbl64(self.raw_data)
+        elif self.attr_type == SZMAPI_CURRENCY:
+            return Decimal(int64(self.raw_data)) / Decimal(10000)
+        elif self.attr_type == SZMAPI_APPTIME:
+            return apptime(self.raw_data)
+        elif self.attr_type == SZMAPI_ERROR:
+            return uint32(self.raw_data)
+        elif self.attr_type == SZMAPI_BOOLEAN:
+            return bool(uint16(self.raw_data))
+        elif self.attr_type == SZMAPI_INT8BYTE:
+            return int8(self.raw_data)
+        elif self.attr_type == SZMAPI_SYSTIME:
+            return systime(self.raw_data)
+        elif self.attr_type == SZMAPI_CLSID:
+            return guid(self.raw_data)
+        elif self.attr_type in (SZMAPI_STRING, SZMAPI_UNICODE_STRING, SZMAPI_BINARY):
+            binary = b''.join([s.rstrip(b'\x00') for s in self.raw_data])
+            if self.attr_type == SZMAPI_BINARY:
+                return binary
+            else:
+                return binary.decode('utf-8')
+        else:
+            return self.raw_data
 
     def __str__(self):
         aname = self.guid_name
