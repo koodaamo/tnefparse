@@ -41,9 +41,9 @@ optional arguments:
 
 The library can also be used as a basis for applications that need to parse TNEF. To parse a TNEF attachment, run eg. :
 
- >>> from tnefparse import TNEF
- >>> with open("tests/examples/one-file.tnef", "rb") as tneffile:
- ...    tnefobj = TNEF(tneffile.read())
+>>> from tnefparse import TNEF
+>>> with open("tests/examples/one-file.tnef", "rb") as tneffile:
+...    tnefobj = TNEF(tneffile.read())
 
 The parsed attachment contents are then available as TNEF object attributes:
 
