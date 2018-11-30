@@ -4,6 +4,7 @@ import logging
 import struct
 import sys
 import uuid
+import warnings
 from datetime import datetime, timedelta
 
 if sys.hexversion < 0x03000000:
@@ -85,6 +86,7 @@ def checksum(data):
 
 def raw_mapi(dataLen, data):
     "debug raw MAPI data when decoding MAPI types"
+    warnings.warn("raw_mapi will be deprecated after 1.3", DeprecationWarning)
     loop = 0
     logger.debug("Raw MAPI Data:")
     while loop <= dataLen:
