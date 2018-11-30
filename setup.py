@@ -33,7 +33,7 @@ setup(name='tnefparse',
       license='LGPL',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       setup_requires=["pytest-runner", "pytest-console-scripts"],
-      tests_require = ['pytest', 'coverage'],
+      tests_require = ['pytest', 'coverage', 'compressed_rtf'],
       include_package_data=True,
       zip_safe=True,
       entry_points = {

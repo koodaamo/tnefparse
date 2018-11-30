@@ -32,6 +32,9 @@ argument('-b', '--body', action='store_true',
 argument('-hb', '--htmlbody', action='store_true',
          help='extract the HTML body to stdout')
 
+argument('-rb', '--rtfbody', action='store_true',
+         help='extract the RTF body to stdout')
+
 argument('-l', '--logging', choices=["DEBUG", "INFO", "WARN", "ERROR"],
          help="enable logging by setting a log level")
 
@@ -83,11 +86,21 @@ def tnefparse():
             for a in t.attachments:
                 with open(pth + a.name.decode('utf-8'), "wb") as afp:
                     afp.write(a.data)
-            sys.exit("Successfully wrote %i files" % len(t.attachments))
+            sys.stderr.write("Successfully wrote %i files\n" % len(t.attachments))
+            sys.exit()
+
+        def print_body(attr, description):
+            body = getattr(t, attr)
+            if body is None:
+                sys.exit("No %s found" % description)
+            elif isinstance(body, bytes):
+                sys.stdout.write(body.decode('latin-1'))
+            else:
+                sys.stdout.write(body)
 
         if args.body:
-            print(getattr(t, "body", "No body found"))
-
+            print_body("body", "body")
         if args.htmlbody:
-            body = getattr(t, "htmlbody", ["No HTML body found"])
-            print(body[0])
+            print_body("htmlbody", "HTML body")
+        if args.rtfbody:
+            print_body("rtfbody", "RTF body")

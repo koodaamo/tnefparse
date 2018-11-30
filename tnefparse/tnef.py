@@ -211,7 +211,7 @@ class TNEF(object):
         self.msgprops = []
         self.body = None
         self.htmlbody = None
-        self.rtfbody = None
+        self._rtfbody = None
         offset = 6
 
         if not do_checksum:
@@ -244,7 +244,7 @@ class TNEF(object):
                     elif p.name == TNEFMAPI_Attribute.MAPI_BODY_HTML:
                         self.htmlbody = p.data
                     elif p.name == TNEFMAPI_Attribute.MAPI_RTF_COMPRESSED:
-                        self.rtfbody = p.data
+                        self._rtfbody = p.data
             elif obj.name == TNEF.ATTBODY:
                 self.body = obj.data
             elif obj.name == TNEF.ATTTNEFVERSION:
@@ -289,7 +289,19 @@ class TNEF(object):
                 logger.debug("Unhandled TNEF Object: %s" % obj)
 
     def has_body(self):
-        return True if (self.body or self.htmlbody or self.rtfbody) else False
+        return True if (self.body or self.htmlbody or self._rtfbody) else False
+
+    @property
+    def rtfbody(self):
+        if self._rtfbody:
+            try:
+                from compressed_rtf import decompress
+                return decompress(self._rtfbody + b'\x00')
+            except ImportError:
+                logger.warning("Returning compressed RTF. Install compressed_rtf to decompress")
+                return self._rtfbody
+        else:
+            return None
 
     def __str__(self):
         atts = (", %i attachments" % len(self.attachments)) if self.attachments else ''
