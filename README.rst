@@ -28,14 +28,14 @@ positional arguments:
   file                  space-separated list of paths to the TNEF files
 
 optional arguments:
-  -h, --help            show this help message and exit
-  -o, --overview        show (possibly long) overview of TNEF file contents
-  -a, --attachments     extract attachments, by default to current dir
-  -p PATH, --path PATH  optional explicit path to extract attachments to
-  -b, --body            extract the body to stdout
-  -hb, --htmlbody       extract the HTML body to stdout
-  -l LEVEL, --log LEVEL set log level to DEBUG, INFO, WARN or ERROR to enable logging
-  -c, --checksum        calculate checksums (off by default)
+  -h, --help             show this help message and exit
+  -o, --overview         show (possibly long) overview of TNEF file contents
+  -a, --attachments      extract attachments, by default to current dir
+  -p PATH, --path PATH   optional explicit path to extract attachments to
+  -b, --body             extract the body to stdout
+  -hb, --htmlbody        extract the HTML body to stdout
+  -l LEVEL, --log LEVEL  set log level to DEBUG, INFO, WARN or ERROR
+  -c, --checksum         calculate checksums (off by default)
 
 
 The library can also be used as a basis for applications that need to parse TNEF. To parse a TNEF attachment, run eg. :
