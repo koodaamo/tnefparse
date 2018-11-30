@@ -1,6 +1,15 @@
 tnefparse - TNEF decoding and attachment extraction
 ===================================================
 
+.. image:: https://badge.fury.io/py/tnefparse.png
+    :target: http://badge.fury.io/py/tnefparse
+
+.. image:: https://travis-ci.org/koodaamo/tnefparse.png?branch=master
+        :target: https://travis-ci.org/koodaamo/tnefparse
+
+.. image:: https://codecov.io/gh/koodaamo/tnefparse/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/koodaamo/tnefparse
+
 This is a pure-python library for decoding Microsoft's Transport Neutral Encapsulation Format (TNEF), for Python
 versions 2.7, 3.5+ and PyPy.
 
@@ -25,7 +34,7 @@ The parsed attachment contents are then available as TNEF object attributes:
 * htmlbody - a string containing just the HTML message body 
 * rtfbody - just the RTF body
 
-See the TNEF class source the for full details. Some of the above properties may be empty, depending on what's contained in the attachment that was parsed.
+Some of the above properties may be empty, depending on what's contained in the attachment that was parsed.
 
 A :code:`tnefparse` command-line utility is also provided for listing contents of TNEF files, extracting attachments found inside them and so on.
 
@@ -34,11 +43,5 @@ Use :code:`python setup.py test` or :code:`python runtests.py` to run the tests.
 Issues and pull requests welcome. **Please however always provide an example TNEF file** that can be used to demonstrate the bug or desired behavior, if at all possible.
 
 **Note: If you have understanding of TNEF and/or MIME internals or just need this package and want to help with maintaining it, I am open to giving you commit rights. Just let me know.**
-
-.. image:: https://badge.fury.io/py/tnefparse.png
-    :target: http://badge.fury.io/py/tnefparse
-
-.. image:: https://travis-ci.org/koodaamo/tnefparse.png?branch=master
-        :target: https://travis-ci.org/koodaamo/tnefparse
 
 .. highlight:: python
