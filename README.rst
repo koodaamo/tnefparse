@@ -18,7 +18,6 @@ is also available as a `PDF download <https://interoperability.blob.core.windows
 A :code:`tnefparse` command-line utility is provided for listing contents of TNEF files, extracting attachments
 found inside them and so on:
 
-```
 usage: tnefparse [-h] [-o] [-a] [-p PATH] [-b] [-hb]
                  [-l {DEBUG,INFO,WARN,ERROR}] [-c]
                  file [file ...]
@@ -38,7 +37,7 @@ optional arguments:
   -l {DEBUG,INFO,WARN,ERROR}, --logging {DEBUG,INFO,WARN,ERROR}
                         enable logging by setting a log level
   -c, --checksum        calculate checksums (off by default)
-```
+
 
 The library can also be used as a basis for applications that need to parse TNEF. To parse a TNEF attachment, run eg. :
 
