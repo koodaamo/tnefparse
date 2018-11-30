@@ -57,7 +57,7 @@ The parsed attachment contents are then available as TNEF object attributes:
 
 Some of the above properties may be empty, depending on what's contained in the attachment that was parsed.
 
-Use :code:`python setup.py test` or :code:`python runtests.py` to run the tests.
+Use :code:`python setup.py test` to run the tests.
 
 Issues and pull requests welcome. **Please however always provide an example TNEF file** that can be used to demonstrate the bug or desired behavior, if at all possible.
 
