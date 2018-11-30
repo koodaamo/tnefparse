@@ -16,27 +16,26 @@ versions 2.7, 3.5+ and PyPy. For more information on TNEF, see for example
 is also available as a `PDF download <https://interoperability.blob.core.windows.net/files/MS-OXTNEF/[MS-OXTNEF].pdf>`_.
 
 A :code:`tnefparse` command-line utility is provided for listing contents of TNEF files, extracting attachments
-found inside them and so on:
-
-usage: tnefparse [-h] [-o] [-a] [-p PATH] [-b] [-hb]
-                 [-l LEVEL] [-c]
-                 file [file ...]
-
-Extract TNEF file contents. Show this help message if no arguments are given.
-
-positional arguments:
-  file                  space-separated list of paths to the TNEF files
-
-optional arguments:
-  -h, --help             show this help message and exit
-  -o, --overview         show (possibly long) overview of TNEF file contents
-  -a, --attachments      extract attachments, by default to current dir
-  -p PATH, --path PATH   optional explicit path to extract attachments to
-  -b, --body             extract the body to stdout
-  -hb, --htmlbody        extract the HTML body to stdout
-  -l LEVEL, --log LEVEL  set log level to DEBUG, INFO, WARN or ERROR
-  -c, --checksum         calculate checksums (off by default)
-
+found inside them and so on::
+ 
+ usage: tnefparse [-h] [-o] [-a] [-p PATH] [-b] [-hb]
+                  [-l LEVEL] [-c]
+                  file [file ...]
+ 
+ Extract TNEF file contents. Show this help message if no arguments are given.
+ 
+ positional arguments:
+   file                  space-separated list of paths to the TNEF files
+ 
+ optional arguments:
+   -h, --help             show this help message and exit
+   -o, --overview         show (possibly long) overview of TNEF file contents
+   -a, --attachments      extract attachments, by default to current dir
+   -p PATH, --path PATH   optional explicit path to extract attachments to
+   -b, --body             extract the body to stdout
+   -hb, --htmlbody        extract the HTML body to stdout
+   -l LEVEL, --log LEVEL  set log level to DEBUG, INFO, WARN or ERROR
+   -c, --checksum         calculate checksums (off by default)
 
 The library can also be used as a basis for applications that need to parse TNEF. To parse a TNEF attachment, run eg. :
 
@@ -64,4 +63,3 @@ Issues and pull requests welcome. **Please however always provide an example TNE
 
 **Note: If you have understanding of TNEF and/or MIME internals or just need this package and want to help with maintaining it, I am open to giving you commit rights. Just let me know.**
 
-.. highlight:: python
