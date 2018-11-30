@@ -16,15 +16,13 @@ class TNEFObject(object):
     PTYPE_STRING = 0x7
 
     def __init__(self, data, do_checksum=False):
+        self.length = len(data)
         self.level = uint8(data, 0)
         self.name = uint16(data, 1)
         self.type = uint16(data, 3)
-        att_length = uint32(data, 5)
-
-        self.data = data[9 : 9 + att_length];
-
-        att_checksum = uint16(data, 9 + att_length)
-        self.length = 11 + att_length
+        self.length = min(self.length, uint32(data, 5) + 11)
+        self.data = data[9 : self.length - 2]
+        att_checksum = uint16(data, self.length - 2)
 
         if do_checksum:
             calc_checksum = checksum(self.data)
