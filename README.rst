@@ -19,7 +19,7 @@ A :code:`tnefparse` command-line utility is provided for listing contents of TNE
 found inside them and so on:
 
 usage: tnefparse [-h] [-o] [-a] [-p PATH] [-b] [-hb]
-                 [-l {DEBUG,INFO,WARN,ERROR}] [-c]
+                 [-l LEVEL] [-c]
                  file [file ...]
 
 Extract TNEF file contents. Show this help message if no arguments are given.
@@ -34,8 +34,7 @@ optional arguments:
   -p PATH, --path PATH  optional explicit path to extract attachments to
   -b, --body            extract the body to stdout
   -hb, --htmlbody       extract the HTML body to stdout
-  -l {DEBUG,INFO,WARN,ERROR}, --logging {DEBUG,INFO,WARN,ERROR}
-                        enable logging by setting a log level
+  -l LEVEL, --log LEVEL set log level to DEBUG, INFO, WARN or ERROR to enable logging
   -c, --checksum        calculate checksums (off by default)
 
 
