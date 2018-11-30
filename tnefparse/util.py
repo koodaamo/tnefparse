@@ -51,6 +51,14 @@ def apptime(byte_arr, offset=0):
     return timedelta(dbl64(byte_arr, offset)) + OLE_TIME_ZERO
 
 
+dt_parts = struct.Struct('<HHHHHH').unpack_from
+
+
+def typtime(byte_arr, offset=0):
+    parts = dt_parts(byte_arr, offset)
+    return datetime(*parts)
+
+
 def bytes_to_int_py3(byte_arr):
     "transform multi-byte values into integers, python3 version"
     return int.from_bytes(byte_arr, byteorder="little", signed=False)
@@ -73,10 +81,6 @@ else:
 
 def checksum(data):
     return sum(bytearray(data)) & 0xFFFF
-
-
-def bytes_to_date(byte_arr):
-    return datetime(*[uint16(byte_arr[n : n + 2]) for n in range(0, 12, 2)])
 
 
 def raw_mapi(dataLen, data):
