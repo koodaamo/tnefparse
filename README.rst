@@ -11,12 +11,36 @@ tnefparse - TNEF decoding and attachment extraction
   :target: https://codecov.io/gh/koodaamo/tnefparse
 
 This is a pure-python library for decoding Microsoft's Transport Neutral Encapsulation Format (TNEF), for Python
-versions 2.7, 3.5+ and PyPy.
-
-For more information on TNEF, see for example `wikipedia <http://en.wikipedia.org/wiki/Transport_Neutral_Encapsulation_Format>`_. The full TNEF specification
+versions 2.7, 3.5+ and PyPy. For more information on TNEF, see for example 
+`wikipedia <http://en.wikipedia.org/wiki/Transport_Neutral_Encapsulation_Format>`_. The full TNEF specification
 is also available as a `PDF download <https://interoperability.blob.core.windows.net/files/MS-OXTNEF/[MS-OXTNEF].pdf>`_.
 
-The library can be used as a basis for applications that need to parse TNEF. To parse a TNEF attachment, run eg. :
+A :code:`tnefparse` command-line utility is provided for listing contents of TNEF files, extracting attachments
+found inside them and so on:
+
+```
+usage: tnefparse [-h] [-o] [-a] [-p PATH] [-b] [-hb]
+                 [-l {DEBUG,INFO,WARN,ERROR}] [-c]
+                 file [file ...]
+
+Extract TNEF file contents. Show this help message if no arguments are given.
+
+positional arguments:
+  file                  space-separated list of paths to the TNEF files
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o, --overview        show (possibly long) overview of TNEF file contents
+  -a, --attachments     extract attachments, by default to current dir
+  -p PATH, --path PATH  optional explicit path to extract attachments to
+  -b, --body            extract the body to stdout
+  -hb, --htmlbody       extract the HTML body to stdout
+  -l {DEBUG,INFO,WARN,ERROR}, --logging {DEBUG,INFO,WARN,ERROR}
+                        enable logging by setting a log level
+  -c, --checksum        calculate checksums (off by default)
+```
+
+The library can also be used as a basis for applications that need to parse TNEF. To parse a TNEF attachment, run eg. :
 
  >>> from tnefparse import TNEF
  >>> with open("tests/examples/one-file.tnef", "rb") as tneffile:
@@ -35,8 +59,6 @@ The parsed attachment contents are then available as TNEF object attributes:
 * rtfbody - just the RTF body
 
 Some of the above properties may be empty, depending on what's contained in the attachment that was parsed.
-
-A :code:`tnefparse` command-line utility is also provided for listing contents of TNEF files, extracting attachments found inside them and so on.
 
 Use :code:`python setup.py test` or :code:`python runtests.py` to run the tests.
 
