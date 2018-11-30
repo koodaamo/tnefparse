@@ -8,6 +8,7 @@ def test_cmdline_overview(script_runner):
     assert "Overview of tests/examples/body.tnef" in ret.stdout
     assert ret.stderr == ''
 
+
 def test_cmdline_attch_extract(script_runner):
     tmpdir = tempfile.mkdtemp()
     ret = script_runner.run('tnefparse', '-a', '-p', tmpdir, 'tests/examples/one-file.tnef')

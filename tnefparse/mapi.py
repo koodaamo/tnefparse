@@ -1,36 +1,49 @@
 "MAPI attribute definitions"
 
-import sys
 import logging
+import sys
 from decimal import Decimal
-from .util import (bytes_to_int, uint8, int8, uint16, int16,
-                   uint32, int32, uint64, int64, float32, dbl64,
-                   guid, systime, apptime)
+
+from .util import (
+    apptime,
+    bytes_to_int,
+    dbl64,
+    float32,
+    guid,
+    int8,
+    int16,
+    int32,
+    int64,
+    systime,
+    uint8,
+    uint16,
+    uint32,
+    uint64,
+)
 
 if sys.hexversion < 0x03000000:
-   range = xrange
+    range = xrange
 
 logger = logging.getLogger("mapi-decode")
 
 
-SZMAPI_UNSPECIFIED    = 0x0000 # MAPI Unspecified
-SZMAPI_NULL           = 0x0001 # MAPI null property
-SZMAPI_SHORT          = 0x0002 # MAPI short (signed 16 bits)
-SZMAPI_INT            = 0x0003 # MAPI integer (signed 32 bits)
-SZMAPI_FLOAT          = 0x0004 # MAPI float (4 bytes)
-SZMAPI_DOUBLE         = 0x0005 # MAPI double
-SZMAPI_CURRENCY       = 0x0006 # MAPI currency (64 bits)
-SZMAPI_APPTIME        = 0x0007 # MAPI application time
-SZMAPI_ERROR          = 0x000a # MAPI error (32 bits)
-SZMAPI_BOOLEAN        = 0x000b # MAPI boolean (16 bits)
-SZMAPI_OBJECT         = 0x000d # MAPI embedded object
-SZMAPI_INT8BYTE       = 0x0014 # MAPI 8 byte signed int
-SZMAPI_STRING         = 0x001e # MAPI string
-SZMAPI_UNICODE_STRING = 0x001f # MAPI unicode-string (null terminated)
-#SZMAPI_PT_SYSTIME     = 0x001e # MAPI time (after 2038/01/17 22:14:07 or before 1970/01/01 00:00:00)
-SZMAPI_SYSTIME        = 0x0040 # MAPI time (64 bits)
-SZMAPI_CLSID          = 0x0048 # MAPI OLE GUID
-SZMAPI_BINARY         = 0x0102 # MAPI binary
+SZMAPI_UNSPECIFIED    = 0x0000  # MAPI Unspecified
+SZMAPI_NULL           = 0x0001  # MAPI null property
+SZMAPI_SHORT          = 0x0002  # MAPI short (signed 16 bits)
+SZMAPI_INT            = 0x0003  # MAPI integer (signed 32 bits)
+SZMAPI_FLOAT          = 0x0004  # MAPI float (4 bytes)
+SZMAPI_DOUBLE         = 0x0005  # MAPI double
+SZMAPI_CURRENCY       = 0x0006  # MAPI currency (64 bits)
+SZMAPI_APPTIME        = 0x0007  # MAPI application time
+SZMAPI_ERROR          = 0x000A  # MAPI error (32 bits)
+SZMAPI_BOOLEAN        = 0x000B  # MAPI boolean (16 bits)
+SZMAPI_OBJECT         = 0x000D  # MAPI embedded object
+SZMAPI_INT8BYTE       = 0x0014  # MAPI 8 byte signed int
+SZMAPI_STRING         = 0x001E  # MAPI string
+SZMAPI_UNICODE_STRING = 0x001F  # MAPI unicode-string (null terminated)
+SZMAPI_SYSTIME        = 0x0040  # MAPI time (64 bits)
+SZMAPI_CLSID          = 0x0048  # MAPI OLE GUID
+SZMAPI_BINARY         = 0x0102  # MAPI binary
 SZMAPI_BEATS_THE_HELL_OUTTA_ME = 0x0033
 
 
@@ -571,16 +584,16 @@ class TNEFMAPI_Attribute(object):
 
     UNCOMPRESSED_BODY = 0x3FD9
 
-    PID_TAG_PRIMARY_SEND_ACCOUNT = 0X0E28
-    PID_TAG_NEXT_SEND_ACCT = 0X0E29
-    PID_TAG_INTERNET_REFERENCES = 0X1039
+    PID_TAG_PRIMARY_SEND_ACCOUNT = 0x0E28
+    PID_TAG_NEXT_SEND_ACCT = 0x0E29
+    PID_TAG_INTERNET_REFERENCES = 0x1039
     PID_TAG_IN_REPLY_TO_ID = 0x1042
     PID_TAG_INTERNET_RETURN_PATH = 0x1046
     PID_TAG_ICON_INDEX = 0x1080
     PID_TAG_TARGET_ENTRY_ID = 0x3010
     PID_TAG_CONVERSATION_ID = 0x3013
 
-    PID_TAG_STORE_UNICODE_MASK = 0X340F
+    PID_TAG_STORE_UNICODE_MASK = 0x340F
     PID_TAG_INTERNET_CODEPAGE = 0x3FDE
     PID_TAG_MESSAGE_LOCALE_ID = 0x3FF1
     PID_TAG_CREATOR_NAME = 0x3FF8
@@ -1118,6 +1131,8 @@ class TNEFMAPI_Attribute(object):
     def __str__(self):
         aname = self.guid_name
         if not aname:
-            aname = TNEFMAPI_Attribute.codes.get(self.name or self.guid_prop, hex(self.guid_prop or self.name))
+            aname = TNEFMAPI_Attribute.codes.get(
+                self.name or self.guid_prop, hex(self.guid_prop or self.name)
+            )
 
         return "<ATTR: %s> %s" % (aname, '')
