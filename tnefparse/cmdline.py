@@ -1,10 +1,13 @@
-import os, sys, argparse, logging
+import argparse
+import logging
+import os
+import sys
+
+from .mapi import TNEFMAPI_Attribute
+from .tnef import TNEF, TNEFAttachment, TNEFObject
 
 logging.basicConfig()
 logging.root.setLevel(logging.ERROR)
-
-from .tnef import TNEF, TNEFAttachment, TNEFObject
-from .mapi import TNEFMAPI_Attribute
 
 
 descr = 'Extract TNEF file contents. Show this help message if no arguments are given.'
@@ -14,76 +17,77 @@ argument = parser.add_argument
 argument('file', type=argparse.FileType('rb'), nargs='+', action="append",
          help='space-separated list of paths to the TNEF files')
 
-argument('-o','--overview', action='store_true',
+argument('-o', '--overview', action='store_true',
          help='show (possibly long) overview of TNEF file contents')
 
-argument('-a','--attachments', action='store_true',
+argument('-a', '--attachments', action='store_true',
          help='extract attachments, by default to current dir')
 
-argument('-p','--path',
+argument('-p', '--path',
          help='optional explicit path to extract attachments to')
 
-argument('-b', '--body', action='store_true', help='extract the body to stdout')
+argument('-b', '--body', action='store_true',
+         help='extract the body to stdout')
 
-argument('-hb', '--htmlbody', action='store_true', help='extract the HTML body to stdout')
+argument('-hb', '--htmlbody', action='store_true',
+         help='extract the HTML body to stdout')
 
-argument('-l', '--logging', help="enable logging by setting a log level",
-         choices = ["DEBUG", "INFO", "WARN", "ERROR"])
+argument('-l', '--logging', choices=["DEBUG", "INFO", "WARN", "ERROR"],
+         help="enable logging by setting a log level")
 
-argument('-c', '--checksum', help="calculate checksums (off by default)",
-         action="store_true", default=False)
-
+argument('-c', '--checksum', action="store_true", default=False,
+         help="calculate checksums (off by default)")
 
 
 def tnefparse():
-   "command-line script"
+    "command-line script"
 
-   if len(sys.argv)==1:
-       parser.print_help()
-       sys.exit(1)
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
 
-   args = parser.parse_args()
+    args = parser.parse_args()
 
-   if args.logging:
-      level = eval("logging." + args.logging)
-      logging.root.setLevel(level)
+    if args.logging:
+        level = eval("logging." + args.logging)
+        logging.root.setLevel(level)
 
-   for tfp in args.file[0]:
-      try:
-         t = TNEF(tfp.read(), do_checksum=args.checksum)
-      except ValueError as exc:
-         sys.exit(exc.message)
-      if args.overview:
-         print("\nOverview of %s: \n" % tfp.name)
+    for tfp in args.file[0]:
+        try:
+            t = TNEF(tfp.read(), do_checksum=args.checksum)
+        except ValueError as exc:
+            sys.exit(exc.message)
+        if args.overview:
+            print("\nOverview of %s: \n" % tfp.name)
 
-         # list TNEF attachments
-         print("  Attachments:\n")
-         for a in t.attachments:
-            print("    " + a.name.decode("utf-8"))
+            # list TNEF attachments
+            print("  Attachments:\n")
+            for a in t.attachments:
+                print("    " + a.name.decode("utf-8"))
 
-         # list TNEF objects
-         print("\n  Objects:\n")
-         print("    " + "\n    ".join([TNEF.codes[o.name] for o in t.objects]))
+            # list TNEF objects
+            print("\n  Objects:\n")
+            print("    " + "\n    ".join([TNEF.codes[o.name] for o in t.objects]))
 
-         # list TNEF MAPI properties
-         print("\n  Properties:\n")
-         for p in t.mapiprops:
-            try:
-               print("    " + TNEFMAPI_Attribute.codes[p.name])
-            except KeyError:
-               logging.root.warning("Unknown MAPI Property: %s" % hex(p.name))
-         print("")
+            # list TNEF MAPI properties
+            print("\n  Properties:\n")
+            for p in t.mapiprops:
+                try:
+                    print("    " + TNEFMAPI_Attribute.codes[p.name])
+                except KeyError:
+                    logging.root.warning("Unknown MAPI Property: %s" % hex(p.name))
+            print("")
 
-      elif args.attachments:
-         pth = args.path.rstrip(os.sep) + os.sep if args.path else ''
-         for a in t.attachments:
-            with open(pth + a.name.decode('utf-8'), "wb") as afp:
-               afp.write(a.data)
-         sys.exit("Successfully wrote %i files" % len(t.attachments))
+        elif args.attachments:
+            pth = args.path.rstrip(os.sep) + os.sep if args.path else ''
+            for a in t.attachments:
+                with open(pth + a.name.decode('utf-8'), "wb") as afp:
+                    afp.write(a.data)
+            sys.exit("Successfully wrote %i files" % len(t.attachments))
 
-      if args.body:
-         print(getattr(t, "body", "No body found"))
+        if args.body:
+            print(getattr(t, "body", "No body found"))
 
-      if args.htmlbody:
-         body = getattr(t, "htmlbody", ["No HTML body found"])
-         print(body[0])
+        if args.htmlbody:
+            body = getattr(t, "htmlbody", ["No HTML body found"])
+            print(body[0])

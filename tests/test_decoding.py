@@ -1,9 +1,13 @@
-import os, sys, logging, tempfile
-
-logging.basicConfig()
+import logging
+import os
+import sys
+import tempfile
 
 from tnefparse import TNEF
 from tnefparse.tnef import to_zip
+
+logging.basicConfig()
+
 
 datadir = os.path.dirname(os.path.realpath(__file__)) + os.sep + "examples"
 
@@ -51,6 +55,7 @@ def pytest_generate_tests(metafunc):
 objnames = lambda t: [TNEF.codes[o.name] for o in t.objects]
 objcodes = lambda t: [o.name for o in t.objects]
 
+
 def test_decode(tnefspec):
     fn, key, attchs, body, objs = tnefspec
     with open(datadir + os.sep + fn, "rb") as tfile:
@@ -66,6 +71,7 @@ def test_decode(tnefspec):
         if objs:
             assert objcodes(t) == objs, "wrong objs: %s" % ["0x%2.2x" % o.name for o in t.objects]
 
+
 def test_zip():
     with open(datadir + os.sep + 'one-file.tnef', "rb") as tfile:
         zip_data = to_zip(tfile.read())
@@ -78,4 +84,4 @@ def to_shortname(longname):
         return longname
     root, ext = os.path.splitext(longname)
     strip = len(ext)
-    return root.upper()[0:10-strip] + '~1' + ext.upper()
+    return root.upper()[0 : 10 - strip] + '~1' + ext.upper()
