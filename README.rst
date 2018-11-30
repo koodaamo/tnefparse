@@ -34,6 +34,7 @@ found inside them and so on::
    -p PATH, --path PATH   optional explicit path to extract attachments to
    -b, --body             extract the body to stdout
    -hb, --htmlbody        extract the HTML body to stdout
+   -rb, --rtfbody         extract the RTF body to stdout
    -l LEVEL, --log LEVEL  set log level to DEBUG, INFO, WARN or ERROR
    -c, --checksum         calculate checksums (off by default)
 
