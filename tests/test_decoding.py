@@ -1,6 +1,5 @@
 import logging
 import os
-import sys
 import tempfile
 
 from tnefparse import TNEF
@@ -44,6 +43,7 @@ SPECS = (
    ("triples.tnef", 0xea64, [], 'body', []),
    ("unicode-mapi-attr-name.tnef", 0x69ec, ['spaconsole2.cfg', 'image001.png', 'image002.png', 'image003.png'], None, []),
    ("unicode-mapi-attr.tnef", 0x408f, ['example.dat'], None, []),
+   ("umlaut.tnef", 0xa2e, ['TBZ PARIV GmbH.jpg', 'image003.jpg', u'UmlautAnhang-\xe4\xfc\xf6.txt'], 'rtfbody', []),
 )
 
 # generate tests for all example files
@@ -64,6 +64,9 @@ def test_decode(tnefspec):
         assert [a.long_filename() for a in t.attachments] == attchs
         for m in t.mapiprops:
             assert m.data is not None
+
+        if t.htmlbody:
+            assert b'html' in t.htmlbody
 
         if body:
             assert getattr(t, body)

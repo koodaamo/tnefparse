@@ -6,7 +6,6 @@ from decimal import Decimal
 
 from .util import (
     apptime,
-    bytes_to_int,
     dbl64,
     float32,
     guid,
@@ -46,17 +45,16 @@ SZMAPI_CLSID          = 0x0048  # MAPI OLE GUID
 SZMAPI_BINARY         = 0x0102  # MAPI binary
 SZMAPI_BEATS_THE_HELL_OUTTA_ME = 0x0033
 
-
 MULTI_VALUE_FLAG = 0x1000
 GUID_EXISTS_FLAG = 0x8000
 
 
-def decode_mapi(data, codepage='cp1252'):
+def decode_mapi(data, codepage='cp1252', starting_offset=None):
     "decode MAPI types"
 
     dataLen = len(data)
     attrs = []
-    offset = 0
+    offset = starting_offset or 0
     num_properties = uint32(data[offset : offset + 4]); offset += 4
 
     try:
@@ -70,11 +68,11 @@ def decode_mapi(data, codepage='cp1252'):
 
             # logger.debug("Attribute type: 0x%4.4x", attr_type)
             # logger.debug("Attribute name: 0x%4.4x", attr_name)
-            guid = ''
+            guid_id = ''
             guid_name = None
             guid_prop = None
             if attr_name >= GUID_EXISTS_FLAG:
-                guid = '%32.32x' % bytes_to_int(data[offset : offset + 16]); offset += 16
+                guid_id = guid(data, offset); offset += 16
                 kind = uint32(data[offset : offset + 4]); offset += 4
                 if kind == 0:
                     guid_prop = uint32(data[offset : offset + 4]); offset += 4
@@ -94,7 +92,7 @@ def decode_mapi(data, codepage='cp1252'):
             for mv in range(num_mv_properties or 1):
                 try:
                     attr_data, offset = parse_property(data, offset, attr_name, attr_type, codepage, num_mv_properties)
-                    attr = TNEFMAPI_Attribute(attr_type, attr_name, attr_data, guid, guid_name, guid_prop)
+                    attr = TNEFMAPI_Attribute(attr_type, attr_name, attr_data, guid_id, guid_name, guid_prop)
                     attrs.append(attr)
                     # print(attr)
                 except Exception:
@@ -112,7 +110,10 @@ def decode_mapi(data, codepage='cp1252'):
         logger.error('decode_mapi Exception %s' % e)
         logger.debug(stack)
 
-    return attrs
+    if starting_offset is not None:
+        return (offset, attrs)
+    else:
+        return attrs
 
 
 def parse_property(data, offset, attr_name, attr_type, codepage, is_multi):
@@ -139,9 +140,9 @@ def parse_property(data, offset, attr_name, attr_type, codepage, is_multi):
             if r != 0:
                 length += 4 - r
             if attr_type == SZMAPI_UNICODE_STRING:
-                attr_data.append(data[offset : offset + length].decode('utf-16').encode('utf-8'))
+                attr_data.append(data[offset : offset + length].decode('utf-16'))
             elif attr_type == SZMAPI_STRING:
-                attr_data.append(data[offset : offset + length].decode(codepage).encode('utf-8'))
+                attr_data.append(data[offset : offset + length].decode(codepage))
             else:
                 attr_data.append(data[offset : offset + length])
             offset += length
@@ -1083,11 +1084,11 @@ class TNEFMAPI_Attribute(object):
     OutlookGuid = '05133f00aa00da98101b450b6ed8da90'
     AppointmentGuid = '46000000000000c00000000000062002'
 
-    def __init__(self, attr_type, name, data, guid, guid_name=None, guid_prop=None):
+    def __init__(self, attr_type, name, data, guid_id, guid_name=None, guid_prop=None):
         self.attr_type = attr_type
         self.name = name
         self.raw_data = data
-        self.guid = guid
+        self.guid = guid_id
         self.guid_name = guid_name
         self.guid_prop = guid_prop
         if self.guid_name:
@@ -1119,20 +1120,18 @@ class TNEFMAPI_Attribute(object):
             return systime(self.raw_data)
         elif self.attr_type == SZMAPI_CLSID:
             return guid(self.raw_data)
-        elif self.attr_type in (SZMAPI_STRING, SZMAPI_UNICODE_STRING, SZMAPI_BINARY):
-            binary = b''.join([s.rstrip(b'\x00') for s in self.raw_data])
-            if self.attr_type == SZMAPI_BINARY:
-                return binary
-            else:
-                return binary.decode('utf-8')
+        elif self.attr_type == SZMAPI_BINARY:
+            return b''.join([s.rstrip(b'\x00') for s in self.raw_data])
+        elif self.attr_type in (SZMAPI_STRING, SZMAPI_UNICODE_STRING):
+            return ''.join([s.rstrip('\x00') for s in self.raw_data])
         else:
             return self.raw_data
 
-    def __str__(self):
-        aname = self.guid_name
-        if not aname:
-            aname = TNEFMAPI_Attribute.codes.get(
-                self.name or self.guid_prop, hex(self.guid_prop or self.name)
-            )
+    @property
+    def name_str(self):
+        return self.guid_name or TNEFMAPI_Attribute.codes.get(
+            self.name or self.guid_prop, hex(self.guid_prop or self.name)
+        )
 
-        return "<ATTR: %s> %s" % (aname, '')
+    def __str__(self):
+        return "<ATTR: %s>" % (self.name_str)
