@@ -11,6 +11,8 @@ tnefparse 1.3 (2018-12-xx)
 - add tnefparse -p | --path option for setting attachment extraction path
 - support more MAPI (PidTag) properties (jrideout)
 - support RTF body extraction (jrideout)
+- support extracting top level object attributues in msgprops
+- the functions uti.raw_mapi and parseFile have been marked for deprecation after 1.3
 
 tnefparse 1.2.3, 2018-11-14
 ============================
