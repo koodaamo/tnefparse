@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages, Command
 import sys, os
 
-version = '1.2.4'
+version = '1.3.0'
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -22,6 +22,8 @@ setup(name='tnefparse',
        'Programming Language :: Python :: 2',
        'Programming Language :: Python :: 3',
        'Programming Language :: Python :: 2.7',
+       'Programming Language :: Python :: 3.5',
+       'Programming Language :: Python :: 3.6',
        'Programming Language :: Python :: 3.7',
        'Development Status :: 4 - Beta',
        'Environment :: Console',
