@@ -55,7 +55,7 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
     dataLen = len(data)
     attrs = []
     offset = starting_offset or 0
-    num_properties = uint32(data[offset : offset + 4]); offset += 4
+    num_properties = uint32(data, offset); offset += 4
 
     try:
         for i in range(num_properties):
@@ -63,8 +63,8 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
                 logger.warn("Skipping property '%i'" % i)
                 continue
 
-            attr_type = uint16(data[offset : offset + 2]); offset += 2
-            attr_name = uint16(data[offset : offset + 2]); offset += 2
+            attr_type = uint16(data, offset); offset += 2
+            attr_name = uint16(data, offset); offset += 2
 
             # logger.debug("Attribute type: 0x%4.4x", attr_type)
             # logger.debug("Attribute name: 0x%4.4x", attr_name)
@@ -73,11 +73,11 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
             guid_prop = None
             if attr_name >= GUID_EXISTS_FLAG:
                 guid_id = guid(data, offset); offset += 16
-                kind = uint32(data[offset : offset + 4]); offset += 4
+                kind = uint32(data, offset); offset += 4
                 if kind == 0:
-                    guid_prop = uint32(data[offset : offset + 4]); offset += 4
+                    guid_prop = uint32(data, offset); offset += 4
                 else:
-                    iidLen = uint32(data[offset : offset + 4]); offset += 4
+                    iidLen = uint32(data, offset); offset += 4
                     q, r = divmod(iidLen, 4)
                     if r != 0:
                         iidLen += 4 - r
@@ -87,7 +87,7 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
             num_mv_properties = None
             if MULTI_VALUE_FLAG & attr_type:
                 attr_type ^= MULTI_VALUE_FLAG
-                num_mv_properties = uint32(data[offset : offset + 4]); offset += 4
+                num_mv_properties = uint32(data, offset); offset += 4
 
             for mv in range(num_mv_properties or 1):
                 try:
@@ -131,11 +131,11 @@ def parse_property(data, offset, attr_name, attr_type, codepage, is_multi):
         if is_multi:
             num_vals = 1
         else:
-            num_vals = uint32(data[offset : offset + 4]); offset += 4
+            num_vals = uint32(data, offset); offset += 4
 
         attr_data = []
         for j in range(num_vals):
-            length = uint32(data[offset : offset + 4]); offset += 4
+            length = uint32(data, offset); offset += 4
             q, r = divmod(length, 4)
             if r != 0:
                 length += 4 - r
