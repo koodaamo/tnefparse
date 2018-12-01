@@ -1,5 +1,5 @@
 
-tnefparse 1.3 (2018-12-xx)
+tnefparse 1.3.0 (2018-12-01)
 =============================
 
 - drop Python 2.6 & 3.3 support
@@ -7,12 +7,12 @@ tnefparse 1.3 (2018-12-xx)
 - more tests & example files (jrideout)
 - overall improved testing & start tracking coverage
 - lots of parsing improvements (jrideout)
-- removed some unnecessary warnings
+- turn some unnecessary warnings into debug messages
 - add tnefparse -p | --path option for setting attachment extraction path
 - support more MAPI (PidTag) properties (jrideout)
 - support RTF body extraction (jrideout)
-- support extracting top level object attributues in msgprops
-- the functions uti.raw_mapi and parseFile have been marked for deprecation after 1.3
+- support extracting top level object attributues in msgprops (jrideout)
+- util.raw_mapi & tnefparse.parseFile functions will be deprecated after 1.3
 
 tnefparse 1.2.3, 2018-11-14
 ============================
