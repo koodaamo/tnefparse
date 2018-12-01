@@ -1,15 +1,16 @@
 
-tnefparse 1.3 (unreleased)
+tnefparse 1.3 (2018-12-xx)
 =============================
 
-- improved compatibility for both Python 2 & 3
-- more test examples (jrideout)
+- drop Python 2.6 & 3.3 support
+- Python 2/3 compatibility fixes
+- more tests & example files (jrideout)
+- overall improved testing & start tracking coverage
 - lots of parsing improvements (jrideout)
 - removed some unnecessary warnings
-- drop Python 2.6 support
-- drop Python 3.3 support, recommend 3.5+
-- add tnefparse -p | --path option for setting explicit output path
-- better testing
+- add tnefparse -p | --path option for setting attachment extraction path
+- support more MAPI (PidTag) properties (jrideout)
+- support RTF body extraction (jrideout)
 
 tnefparse 1.2.3, 2018-11-14
 ============================
