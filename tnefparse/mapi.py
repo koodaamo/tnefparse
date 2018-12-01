@@ -78,7 +78,7 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
                     guid_prop = uint32(data, offset); offset += 4
                 else:
                     iidLen = uint32(data, offset); offset += 4
-                    q, r = divmod(iidLen, 4)
+                    r = iidLen % 4
                     if r != 0:
                         iidLen += 4 - r
                     guid_name = data[offset : offset + iidLen].decode('utf-16')
@@ -136,7 +136,7 @@ def parse_property(data, offset, attr_name, attr_type, codepage, is_multi):
         attr_data = []
         for j in range(num_vals):
             length = uint32(data, offset); offset += 4
-            q, r = divmod(length, 4)
+            r = length % 4
             if r != 0:
                 length += 4 - r
             if attr_type == SZMAPI_UNICODE_STRING:
