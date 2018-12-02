@@ -214,8 +214,11 @@ class TNEFMAPI_Attribute(object):
 
     @property
     def name_str(self):
-        return self.guid_name or TNEFMAPI_Attribute.codes.get(
-            self.name or self.guid_prop, hex(self.guid_prop or self.name)
+        return (
+            self.guid_name or
+            TNEFMAPI_Attribute.codes.get(self.name) or
+            TNEFMAPI_Attribute.codes.get(self.guid_prop) or
+            hex(self.guid_prop or self.name)
         )
 
     def __str__(self):
