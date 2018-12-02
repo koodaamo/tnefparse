@@ -3,11 +3,9 @@ import os
 import tempfile
 
 from tnefparse import TNEF
-from tnefparse.tnef import to_zip
+from tnefparse.tnef import to_zip, TNEFMAPI_Attribute
 
 logging.basicConfig()
-
-
 datadir = os.path.dirname(os.path.realpath(__file__)) + os.sep + "examples"
 
 SPECS = (
@@ -60,14 +58,15 @@ SPECS = (
    ("bad_checksum.tnef", 0x5784, ['image001.png'], 'body', []),
 )
 
+
 # generate tests for all example files
 def pytest_generate_tests(metafunc):
     if "tnefspec" in metafunc.funcargnames:
         metafunc.parametrize("tnefspec", SPECS, ids=[s[0] for s in SPECS])
 
 
-objnames = lambda t: [TNEF.codes[o.name] for o in t.objects]
-objcodes = lambda t: [o.name for o in t.objects]
+def objcodes(tnef):
+    return [o.name for o in tnef.objects]
 
 
 def test_decode(tnefspec):
@@ -85,6 +84,13 @@ def test_decode(tnefspec):
             for m in a.mapi_attrs:
                 assert m.__str__()
                 assert m.data is not None
+
+        for m in t.msgprops:
+            assert m.__str__()
+            assert m.data is not None
+            if m.name == TNEF.ATTRECIPTABLE:
+                for n_m in m.data[0]:
+                    assert isinstance(n_m, TNEFMAPI_Attribute)
 
         if t.htmlbody:
             assert b'html' in t.htmlbody

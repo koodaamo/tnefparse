@@ -277,8 +277,8 @@ class TNEF(object):
                 att_offset = 4
                 recipients = []
                 for _ in range(rows):
-                    att_offset, recipients = decode_mapi(obj.data, self.codepage, starting_offset=att_offset)
-                    recipients.append(recipients)
+                    att_offset, recipient = decode_mapi(obj.data, self.codepage, starting_offset=att_offset)
+                    recipients.append(recipient)
                 obj.data = recipients
                 self.msgprops.append(obj)
             elif obj.name == TNEF.ATTFROM:
