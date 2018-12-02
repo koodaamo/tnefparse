@@ -4,7 +4,8 @@ import logging
 import os
 
 from . import properties as Attribute
-from .mapi import TNEFMAPI_Attribute, decode_mapi
+from .codepage import Codepage
+from .mapi import decode_mapi
 from .util import typtime, bytes_to_int, checksum, uint32, uint16, uint8
 
 logger = logging.getLogger("tnef-decode")
@@ -90,15 +91,22 @@ class TNEFAttachment(object):
     def __init__(self, codepage):
         self.codepage = codepage
         self.mapi_attrs = []
-        self.name = b''
+        self._name = b''
         self.data = b''
+
+    @property
+    def name(self):
+        if isinstance(self._name, bytes):
+            return self._name.decode().strip('\x00')
+        else:
+            return self._name.strip('\x00')
 
     def long_filename(self):
         atname = Attribute.MAPI_ATTACH_LONG_FILENAME
         name = [a.data for a in self.mapi_attrs if a.name == atname]
         if name:
             return name[0]
-        return self.name.decode()
+        return self.name
 
     def add_attr(self, attribute):
         # For now, we ignore rendering/preview properties
@@ -110,7 +118,7 @@ class TNEFAttachment(object):
             mapi_attrs = decode_mapi(attribute.data, self.codepage)
             for p in mapi_attrs:
                 if p.name == Attribute.MAPI_ATTACH_FILENAME:
-                    self.name = p.data
+                    self._name = p.data
                 elif p.name == Attribute.MAPI_ATTACH_DATA_OBJ:
                     self.data = p.data
                 elif p.name == Attribute.MAPI_ATTACH_RENDERING:
@@ -118,7 +126,7 @@ class TNEFAttachment(object):
                 else:
                     self.mapi_attrs.append(p)
         elif attribute.name == TNEF.ATTATTACHTITLE:
-            self.name = attribute.data.strip(b'\x00')  # remove any NULLs
+            self._name = attribute.data
         elif attribute.name == TNEF.ATTATTACHDATA:
             self.data = attribute.data
         elif attribute.name == TNEF.ATTATTACHRENDDATA:
@@ -246,9 +254,12 @@ class TNEF(object):
             elif obj.name == TNEF.ATTMAPIPROPS:
                 # handle MAPI properties
                 mapiprops = decode_mapi(obj.data, self.codepage)
+                internet_codepage = None
 
                 # handle BODY property
                 for p in mapiprops:
+                    if p.name == Attribute.MAPI_INTERNET_CODEPAGE:
+                        internet_codepage = Codepage(p.data)
                     if p.name == Attribute.MAPI_BODY:
                         self.body = p.data
                     elif p.name == Attribute.MAPI_UNCOMPRESSED_BODY:
@@ -259,13 +270,17 @@ class TNEF(object):
                         self._rtfbody = p.data
                     else:
                         self.mapiprops.append(p)
+                if self.htmlbody and internet_codepage:
+                    self.htmlbody = internet_codepage.decode(self.htmlbody)
+                if self.body and internet_codepage:
+                    self.body = internet_codepage.decode(self.body)
             elif obj.name == TNEF.ATTBODY:
                 self.body = obj.data
             elif obj.name == TNEF.ATTTNEFVERSION:
                 if uint32(obj.data) != TNEF.VALID_VERSION:
                     logger.warning('Invalid TNEF Version %02x%02x%02x%02x', *obj.data)
             elif obj.name == TNEF.ATTOEMCODEPAGE:
-                self.codepage = 'cp%d' % uint32(obj.data)
+                self.codepage = Codepage(uint32(obj.data)).codepage()
             elif obj.type in (TNEFObject.PTYPE_CLASS, TNEFObject.PTYPE_STRING):
                 obj.data = obj.data.decode(self.codepage).rstrip('\x00')
                 self.msgprops.append(obj)
@@ -347,7 +362,7 @@ def to_zip(data, default_name=u'no-name', deflate=True):
     # Convert the TNEF file to an equivalent ZIP file
     tozip = {}
     for attachment in tnef.attachments:
-        filename = attachment.name.decode() or default_name
+        filename = attachment.name or default_name
         L = len(tozip.get(filename, []))
         if L > 0:
             # uniqify this file name by adding -<num> before the extension

@@ -3,7 +3,8 @@ import os
 import tempfile
 
 from tnefparse import TNEF
-from tnefparse.tnef import to_zip, TNEFMAPI_Attribute
+from tnefparse.tnef import to_zip
+from tnefparse.mapi import TNEFMAPI_Attribute
 
 logging.basicConfig()
 datadir = os.path.dirname(os.path.realpath(__file__)) + os.sep + "examples"
@@ -93,7 +94,7 @@ def test_decode(tnefspec):
                     assert isinstance(n_m, TNEFMAPI_Attribute)
 
         if t.htmlbody:
-            assert b'html' in t.htmlbody
+            assert 'html' in t.htmlbody
 
         if body:
             assert getattr(t, body)
