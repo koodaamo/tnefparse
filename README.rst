@@ -37,6 +37,7 @@ found inside them and so on::
    -rb, --rtfbody         extract the RTF body to stdout
    -l LEVEL, --log LEVEL  set log level to DEBUG, INFO, WARN or ERROR
    -c, --checksum         calculate checksums (off by default)
+   -d, --dump             extract a json dump of the tnef contents
 
 The library can also be used as a basis for applications that need to parse TNEF. To parse a TNEF attachment, run eg. :
 

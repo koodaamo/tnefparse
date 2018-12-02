@@ -1,3 +1,4 @@
+import json
 import shutil
 import tempfile
 
@@ -55,3 +56,11 @@ def test_cmdline_rtfbody(script_runner):
     assert len(ret.stdout) == 593
     assert ret.stderr == ''
     assert ret.success
+
+
+def test_dump(script_runner):
+    ret = script_runner.run('tnefparse', '-d', 'tests/examples/two-files.tnef')
+    assert ret.success
+    dump = json.loads(ret.stdout)
+    assert sorted(list(dump.keys())) == [u'attachments', u'attributes', u'extended_attributes']
+    assert len(dump['attachments']) == 2

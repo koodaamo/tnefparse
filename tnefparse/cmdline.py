@@ -1,4 +1,5 @@
 import argparse
+import json
 import logging
 import os
 import sys
@@ -41,6 +42,9 @@ argument('-l', '--logging', choices=["DEBUG", "INFO", "WARN", "ERROR"],
 argument('-c', '--checksum', action="store_true", default=False,
          help="calculate checksums (off by default)")
 
+argument('-d', '--dump', action="store_true", default=False,
+         help="extract a json dump of the tnef contents")
+
 
 def tnefparse():
     "command-line script"
@@ -66,7 +70,7 @@ def tnefparse():
             # list TNEF attachments
             print("  Attachments:\n")
             for a in t.attachments:
-                print("    " + a.name.decode("utf-8"))
+                print("    " + a.name)
 
             # list TNEF objects
             print("\n  Objects:\n")
@@ -81,10 +85,13 @@ def tnefparse():
                     logging.root.warning("Unknown MAPI Property: %s" % hex(p.name))
             print("")
 
+        elif args.dump:
+            print(json.dumps(t.dump(force_strings=True), sort_keys=True, indent=4))
+
         elif args.attachments:
             pth = args.path.rstrip(os.sep) + os.sep if args.path else ''
             for a in t.attachments:
-                with open(pth + a.name.decode('utf-8'), "wb") as afp:
+                with open(pth + a.name, "wb") as afp:
                     afp.write(a.data)
             sys.stderr.write("Successfully wrote %i files\n" % len(t.attachments))
             sys.exit()

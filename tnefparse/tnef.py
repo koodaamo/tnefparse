@@ -2,9 +2,11 @@
 """
 import logging
 import os
+from datetime import datetime
 
 from . import properties as Attribute
-from .mapi import TNEFMAPI_Attribute, decode_mapi
+from .codepage import Codepage
+from .mapi import decode_mapi
 from .util import typtime, bytes_to_int, checksum, uint32, uint16, uint8
 
 logger = logging.getLogger("tnef-decode")
@@ -35,8 +37,12 @@ class TNEFObject(object):
         # whether the checksum is ok
         self.good_checksum = calc_checksum == att_checksum
 
+    @property
+    def name_str(self):
+        return TNEF.codes.get(self.name)
+
     def __str__(self):
-        return "<%s '%s'>" % (self.__class__.__name__, TNEF.codes.get(self.name))
+        return "<%s '%s'>" % (self.__class__.__name__, self.name_str)
 
 
 class TNEFAttachment(object):
@@ -86,26 +92,42 @@ class TNEFAttachment(object):
     def __init__(self, codepage):
         self.codepage = codepage
         self.mapi_attrs = []
-        self.name = b''
+        self._name = b''
         self.data = b''
+
+    @property
+    def name(self):
+        if isinstance(self._name, bytes):
+            return self._name.decode().strip('\x00')
+        else:
+            return self._name.strip('\x00')
 
     def long_filename(self):
         atname = Attribute.MAPI_ATTACH_LONG_FILENAME
         name = [a.data for a in self.mapi_attrs if a.name == atname]
         if name:
             return name[0]
-        return self.name.decode()
+        return self.name
 
     def add_attr(self, attribute):
-        #     logger.debug("Attachment attr name: 0x%4.4x" % attribute.name)
+        # For now, we ignore rendering/preview properties
         if attribute.name == TNEF.ATTATTACHMODIFYDATE:
             self.modification_date = typtime(attribute.data)
         elif attribute.name == TNEF.ATTATTACHCREATEDATE:
             self.creation_date = typtime(attribute.data)
         elif attribute.name == TNEF.ATTATTACHMENT:
-            self.mapi_attrs += decode_mapi(attribute.data, self.codepage)
+            mapi_attrs = decode_mapi(attribute.data, self.codepage)
+            for p in mapi_attrs:
+                if p.name == Attribute.MAPI_ATTACH_FILENAME:
+                    self._name = p.data
+                elif p.name == Attribute.MAPI_ATTACH_DATA_OBJ:
+                    self.data = p.data
+                elif p.name == Attribute.MAPI_ATTACH_RENDERING:
+                    pass
+                else:
+                    self.mapi_attrs.append(p)
         elif attribute.name == TNEF.ATTATTACHTITLE:
-            self.name = attribute.data.strip(b'\x00')  # remove any NULLs
+            self._name = attribute.data
         elif attribute.name == TNEF.ATTATTACHDATA:
             self.data = attribute.data
         elif attribute.name == TNEF.ATTATTACHRENDDATA:
@@ -232,10 +254,13 @@ class TNEF(object):
                 attachment.add_attr(obj)
             elif obj.name == TNEF.ATTMAPIPROPS:
                 # handle MAPI properties
-                self.mapiprops = decode_mapi(obj.data, self.codepage)
+                mapiprops = decode_mapi(obj.data, self.codepage)
+                internet_codepage = None
 
                 # handle BODY property
-                for p in self.mapiprops:
+                for p in mapiprops:
+                    if p.name == Attribute.MAPI_INTERNET_CODEPAGE:
+                        internet_codepage = Codepage(p.data)
                     if p.name == Attribute.MAPI_BODY:
                         self.body = p.data
                     elif p.name == Attribute.MAPI_UNCOMPRESSED_BODY:
@@ -244,15 +269,21 @@ class TNEF(object):
                         self.htmlbody = p.data
                     elif p.name == Attribute.MAPI_RTF_COMPRESSED:
                         self._rtfbody = p.data
+                    else:
+                        self.mapiprops.append(p)
+                if self.htmlbody and internet_codepage:
+                    self.htmlbody = internet_codepage.decode(self.htmlbody)
+                if self.body and internet_codepage:
+                    self.body = internet_codepage.decode(self.body)
             elif obj.name == TNEF.ATTBODY:
                 self.body = obj.data
             elif obj.name == TNEF.ATTTNEFVERSION:
                 if uint32(obj.data) != TNEF.VALID_VERSION:
                     logger.warning('Invalid TNEF Version %02x%02x%02x%02x', *obj.data)
             elif obj.name == TNEF.ATTOEMCODEPAGE:
-                self.codepage = 'cp%d' % uint32(obj.data)
+                self.codepage = Codepage(uint32(obj.data)).codepage()
             elif obj.type in (TNEFObject.PTYPE_CLASS, TNEFObject.PTYPE_STRING):
-                obj.data = obj.data.decode(self.codepage)
+                obj.data = obj.data.decode(self.codepage).rstrip('\x00')
                 self.msgprops.append(obj)
             elif obj.name == TNEF.ATTPRIORITY:
                 obj.data = 3 - uint16(obj.data)
@@ -262,8 +293,8 @@ class TNEF(object):
                 att_offset = 4
                 recipients = []
                 for _ in range(rows):
-                    att_offset, recipients = decode_mapi(obj.data, self.codepage, starting_offset=att_offset)
-                    recipients.append(recipients)
+                    att_offset, recipient = decode_mapi(obj.data, self.codepage, starting_offset=att_offset)
+                    recipients.append(recipient)
                 obj.data = recipients
                 self.msgprops.append(obj)
             elif obj.name == TNEF.ATTFROM:
@@ -306,6 +337,40 @@ class TNEF(object):
         atts = (", %i attachments" % len(self.attachments)) if self.attachments else ''
         return "<%s:0x%2.2x%s>" % (self.__class__.__name__, self.key, atts)
 
+    def dump(self, force_strings=False):
+        def get_data(a):
+            if force_strings and isinstance(a.data, bytes):
+                return a.data.decode('ascii', errors="replace")
+            elif force_strings and isinstance(a.data, tuple) and isinstance(a.data[0], bytes):
+                return [s.decode('ascii', errors="replace") for s in a.data]
+            elif force_strings and isinstance(a.data, datetime):
+                return a.data.__str__()
+            else:
+                return a.data
+        out = {'attachments': [], 'attributes': {}, 'extended_attributes': {}}
+        for o in self.attachments:
+            attachment = {
+                'filename': o.name,
+                'long_filename': o.long_filename(),
+                'data_len': len(o.data),
+            }
+            for att in o.mapi_attrs:
+                attachment[att.name_str] = get_data(att)
+            out['attachments'].append(attachment)
+        for o in self.msgprops:
+            data = get_data(o)
+            if o.name == TNEF.ATTRECIPTABLE:
+                data = []
+                for recipient in o.data:
+                    rec = {}
+                    for att in recipient:
+                        rec[att.name_str] = get_data(att)
+                    data.append(rec)
+            out['attributes'][o.name_str] = data
+        for att in self.mapiprops:
+            out['extended_attributes'][att.name_str] = get_data(att)
+        return out
+
 
 def valid_version(data):
     version = uint32(data)
@@ -314,11 +379,11 @@ def valid_version(data):
 
 def triples(data):
     assert uint16(data) == 4
-    struct_length = uint16(data, 2)
+    # struct_length = uint16(data, 2)
     sender_length = uint16(data, 4)
     email_length = uint16(data, 6)
-    sender = data[8:8+sender_length]
-    etype_email = data[8+sender_length:8+sender_length+email_length]
+    sender = data[8 : 8 + sender_length]
+    etype_email = data[8 + sender_length : 8 + sender_length + email_length]
     etype, email = etype_email.split(b':', 1)
 
     return sender.rstrip(b'\x00'), etype, email.rstrip(b'\x00')
@@ -332,7 +397,7 @@ def to_zip(data, default_name=u'no-name', deflate=True):
     # Convert the TNEF file to an equivalent ZIP file
     tozip = {}
     for attachment in tnef.attachments:
-        filename = attachment.name.decode() or default_name
+        filename = attachment.name or default_name
         L = len(tozip.get(filename, []))
         if L > 0:
             # uniqify this file name by adding -<num> before the extension
