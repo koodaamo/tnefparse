@@ -3,6 +3,7 @@
 import logging
 import os
 
+from . import properties as Attribute
 from .mapi import TNEFMAPI_Attribute, decode_mapi
 from .util import typtime, bytes_to_int, checksum, uint32, uint16, uint8
 
@@ -89,7 +90,7 @@ class TNEFAttachment(object):
         self.data = b''
 
     def long_filename(self):
-        atname = TNEFMAPI_Attribute.MAPI_ATTACH_LONG_FILENAME
+        atname = Attribute.MAPI_ATTACH_LONG_FILENAME
         name = [a.data for a in self.mapi_attrs if a.name == atname]
         if name:
             return name[0]
@@ -235,13 +236,13 @@ class TNEF(object):
 
                 # handle BODY property
                 for p in self.mapiprops:
-                    if p.name == TNEFMAPI_Attribute.MAPI_BODY:
+                    if p.name == Attribute.MAPI_BODY:
                         self.body = p.data
-                    elif p.name == TNEFMAPI_Attribute.UNCOMPRESSED_BODY:
+                    elif p.name == Attribute.UNCOMPRESSED_BODY:
                         self.body = p.data
-                    elif p.name == TNEFMAPI_Attribute.MAPI_BODY_HTML:
+                    elif p.name == Attribute.MAPI_BODY_HTML:
                         self.htmlbody = p.data
-                    elif p.name == TNEFMAPI_Attribute.MAPI_RTF_COMPRESSED:
+                    elif p.name == Attribute.MAPI_RTF_COMPRESSED:
                         self._rtfbody = p.data
             elif obj.name == TNEF.ATTBODY:
                 self.body = obj.data
