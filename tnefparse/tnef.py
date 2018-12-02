@@ -238,7 +238,7 @@ class TNEF(object):
                 for p in self.mapiprops:
                     if p.name == Attribute.MAPI_BODY:
                         self.body = p.data
-                    elif p.name == Attribute.UNCOMPRESSED_BODY:
+                    elif p.name == Attribute.MAPI_UNCOMPRESSED_BODY:
                         self.body = p.data
                     elif p.name == Attribute.MAPI_BODY_HTML:
                         self.htmlbody = p.data
