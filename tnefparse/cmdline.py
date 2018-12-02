@@ -3,8 +3,8 @@ import logging
 import os
 import sys
 
-from .mapi import TNEFMAPI_Attribute
-from .tnef import TNEF, TNEFAttachment, TNEFObject
+from . import properties
+from .tnef import TNEF
 
 logging.basicConfig()
 logging.root.setLevel(logging.ERROR)
@@ -76,7 +76,7 @@ def tnefparse():
             print("\n  Properties:\n")
             for p in t.mapiprops:
                 try:
-                    print("    " + TNEFMAPI_Attribute.codes[p.name])
+                    print("    " + properties.CODE_TO_NAME[p.name])
                 except KeyError:
                     logging.root.warning("Unknown MAPI Property: %s" % hex(p.name))
             print("")
