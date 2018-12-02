@@ -35,8 +35,12 @@ class TNEFObject(object):
         # whether the checksum is ok
         self.good_checksum = calc_checksum == att_checksum
 
+    @property
+    def name_str(self):
+        return TNEF.codes.get(self.name)
+
     def __str__(self):
-        return "<%s '%s'>" % (self.__class__.__name__, TNEF.codes.get(self.name))
+        return "<%s '%s'>" % (self.__class__.__name__, self.name_str)
 
 
 class TNEFAttachment(object):
@@ -97,13 +101,22 @@ class TNEFAttachment(object):
         return self.name.decode()
 
     def add_attr(self, attribute):
-        #     logger.debug("Attachment attr name: 0x%4.4x" % attribute.name)
+        # For now, we ignore rendering/preview properties
         if attribute.name == TNEF.ATTATTACHMODIFYDATE:
             self.modification_date = typtime(attribute.data)
         elif attribute.name == TNEF.ATTATTACHCREATEDATE:
             self.creation_date = typtime(attribute.data)
         elif attribute.name == TNEF.ATTATTACHMENT:
-            self.mapi_attrs += decode_mapi(attribute.data, self.codepage)
+            mapi_attrs = decode_mapi(attribute.data, self.codepage)
+            for p in mapi_attrs:
+                if p.name == Attribute.MAPI_ATTACH_FILENAME:
+                    self.name = p.data
+                elif p.name == Attribute.MAPI_ATTACH_DATA_OBJ:
+                    self.data = p.data
+                elif p.name == Attribute.MAPI_ATTACH_RENDERING:
+                    pass
+                else:
+                    self.mapi_attrs.append(p)
         elif attribute.name == TNEF.ATTATTACHTITLE:
             self.name = attribute.data.strip(b'\x00')  # remove any NULLs
         elif attribute.name == TNEF.ATTATTACHDATA:
@@ -232,10 +245,10 @@ class TNEF(object):
                 attachment.add_attr(obj)
             elif obj.name == TNEF.ATTMAPIPROPS:
                 # handle MAPI properties
-                self.mapiprops = decode_mapi(obj.data, self.codepage)
+                mapiprops = decode_mapi(obj.data, self.codepage)
 
                 # handle BODY property
-                for p in self.mapiprops:
+                for p in mapiprops:
                     if p.name == Attribute.MAPI_BODY:
                         self.body = p.data
                     elif p.name == Attribute.MAPI_UNCOMPRESSED_BODY:
@@ -244,6 +257,8 @@ class TNEF(object):
                         self.htmlbody = p.data
                     elif p.name == Attribute.MAPI_RTF_COMPRESSED:
                         self._rtfbody = p.data
+                    else:
+                        self.mapiprops.append(p)
             elif obj.name == TNEF.ATTBODY:
                 self.body = obj.data
             elif obj.name == TNEF.ATTTNEFVERSION:
