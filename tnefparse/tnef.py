@@ -2,6 +2,7 @@
 """
 import logging
 import os
+from datetime import datetime
 
 from . import properties as Attribute
 from .codepage import Codepage
@@ -336,6 +337,40 @@ class TNEF(object):
         atts = (", %i attachments" % len(self.attachments)) if self.attachments else ''
         return "<%s:0x%2.2x%s>" % (self.__class__.__name__, self.key, atts)
 
+    def dump(self, force_strings=False):
+        def get_data(a):
+            if force_strings and isinstance(a.data, bytes):
+                return a.data.decode('ascii', errors="replace")
+            elif force_strings and isinstance(a.data, tuple) and isinstance(a.data[0], bytes):
+                return [s.decode('ascii', errors="replace") for s in a.data]
+            elif force_strings and isinstance(a.data, datetime):
+                return a.data.__str__()
+            else:
+                return a.data
+        out = {'attachments': [], 'attributes': {}, 'extended_attributes': {}}
+        for o in self.attachments:
+            attachment = {
+                'filename': o.name,
+                'long_filename': o.long_filename(),
+                'data_len': len(o.data),
+            }
+            for att in o.mapi_attrs:
+                attachment[att.name_str] = get_data(att)
+            out['attachments'].append(attachment)
+        for o in self.msgprops:
+            data = get_data(o)
+            if o.name == TNEF.ATTRECIPTABLE:
+                data = []
+                for recipient in o.data:
+                    rec = {}
+                    for att in recipient:
+                        rec[att.name_str] = get_data(att)
+                    data.append(rec)
+            out['attributes'][o.name_str] = data
+        for att in self.mapiprops:
+            out['extended_attributes'][att.name_str] = get_data(att)
+        return out
+
 
 def valid_version(data):
     version = uint32(data)
@@ -344,11 +379,11 @@ def valid_version(data):
 
 def triples(data):
     assert uint16(data) == 4
-    struct_length = uint16(data, 2)
+    # struct_length = uint16(data, 2)
     sender_length = uint16(data, 4)
     email_length = uint16(data, 6)
-    sender = data[8:8+sender_length]
-    etype_email = data[8+sender_length:8+sender_length+email_length]
+    sender = data[8 : 8 + sender_length]
+    etype_email = data[8 + sender_length : 8 + sender_length + email_length]
     etype, email = etype_email.split(b':', 1)
 
     return sender.rstrip(b'\x00'), etype, email.rstrip(b'\x00')

@@ -1,4 +1,5 @@
 import argparse
+import json
 import logging
 import os
 import sys
@@ -40,6 +41,9 @@ argument('-l', '--logging', choices=["DEBUG", "INFO", "WARN", "ERROR"],
 
 argument('-c', '--checksum', action="store_true", default=False,
          help="calculate checksums (off by default)")
+
+argument('-d', '--dump', action="store_true", default=False,
+         help="extract a json dump of the tnef contents")
 
 
 def tnefparse():

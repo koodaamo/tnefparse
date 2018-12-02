@@ -108,6 +108,9 @@ def test_decode(tnefspec):
         if objs:
             assert objcodes(t) == objs, "wrong objs: %s" % ["0x%2.2x" % o.name for o in t.objects]
 
+        assert t.dump(True)
+        assert t.dump(False)
+
 
 def test_zip():
     with open(datadir + os.sep + 'one-file.tnef', "rb") as tfile:
