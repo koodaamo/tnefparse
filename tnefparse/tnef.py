@@ -267,7 +267,7 @@ class TNEF(object):
             elif obj.name == TNEF.ATTOEMCODEPAGE:
                 self.codepage = 'cp%d' % uint32(obj.data)
             elif obj.type in (TNEFObject.PTYPE_CLASS, TNEFObject.PTYPE_STRING):
-                obj.data = obj.data.decode(self.codepage)
+                obj.data = obj.data.decode(self.codepage).rstrip('\x00')
                 self.msgprops.append(obj)
             elif obj.name == TNEF.ATTPRIORITY:
                 obj.data = 3 - uint16(obj.data)
