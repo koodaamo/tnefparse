@@ -1,7 +1,8 @@
 tnefparse 1.3.1 (unreleased)
 =============================
 
-- nothing yet
+- heuristics to decode binary body and filenames when possible (jrideout)
+- JSON export for TNEF contents tnefparse (jrideout)
 
 tnefparse 1.3.0 (2018-12-01)
 =============================
