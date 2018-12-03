@@ -1,17 +1,17 @@
 """
 Tool to regenerate tnefparse/properties.py
 
-The mapping of property names to numeric value is maintained in properties.txt
+The mapping of property names to numeric value is maintained in data/properties.txt
 
 Use:
-    python make_props.py  > tnefparse/properties.py
+    python scripts/make_props.py
 
 """
 from collections import OrderedDict
 
 properties = OrderedDict()
 
-with open('properties.txt', 'r') as props:
+with open('data/properties.txt', 'r') as props:
     for prop in props:
         prop = prop.strip()
         if not prop or prop.startswith('#'):
@@ -20,7 +20,9 @@ with open('properties.txt', 'r') as props:
         properties[name] = val
 sort_by_val = OrderedDict(sorted(properties.items(), key=lambda t: t[1]))
 
-print('''"""
+with open('tnefparse/properties.py', 'w') as out:
+
+    out.write('''"""
 Property reference docs:
 
  - https://docs.microsoft.com/en-us/office/client-developer/outlook/mapi/mapping-canonical-property-names-to-mapi-names#tagged-properties
@@ -57,13 +59,14 @@ Property reference docs:
 +----------------+----------------+-------------------------------------------------------------------------------+
 """
 
+
 ''')
 
-for name, val in sort_by_val.items():
-    print(f'{name} = {val}')
+    for name, val in sort_by_val.items():
+        out.write(f'{name} = {val}\n')
 
-print()
-print('CODE_TO_NAME = {')
-for name, _ in sort_by_val.items():
-    print(f'    {name}: "{name}",')
-print('}')
+    out.write('\n')
+    out.write('CODE_TO_NAME = {\n')
+    for name, _ in sort_by_val.items():
+        out.write(f'    {name}: "{name}",\n')
+    out.write('}\n')
