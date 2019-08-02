@@ -70,7 +70,7 @@ def tnefparse():
             # list TNEF attachments
             print("  Attachments:\n")
             for a in t.attachments:
-                print("    " + a.name)
+                print("    " + a.long_filename())
 
             # list TNEF objects
             print("\n  Objects:\n")
@@ -91,7 +91,7 @@ def tnefparse():
         elif args.attachments:
             pth = args.path.rstrip(os.sep) + os.sep if args.path else ''
             for a in t.attachments:
-                with open(pth + a.name, "wb") as afp:
+                with open(pth + a.long_filename(), "wb") as afp:
                     afp.write(a.data)
             sys.stderr.write("Successfully wrote %i files\n" % len(t.attachments))
             sys.exit()
