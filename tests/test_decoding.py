@@ -62,7 +62,7 @@ SPECS = (
 
 # generate tests for all example files
 def pytest_generate_tests(metafunc):
-    if "tnefspec" in metafunc.funcargnames:
+    if "tnefspec" in metafunc.fixturenames:
         metafunc.parametrize("tnefspec", SPECS, ids=[s[0] for s in SPECS])
 
 
