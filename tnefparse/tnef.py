@@ -3,6 +3,7 @@
 import logging
 import os
 from datetime import datetime
+from uuid import UUID
 
 from . import properties as Attribute
 from .codepage import Codepage
@@ -343,7 +344,7 @@ class TNEF(object):
                 return a.data.decode('ascii', errors="replace")
             elif force_strings and isinstance(a.data, tuple) and isinstance(a.data[0], bytes):
                 return [s.decode('ascii', errors="replace") for s in a.data]
-            elif force_strings and isinstance(a.data, datetime):
+            elif force_strings and (isinstance(a.data, datetime) or isinstance(a.data, UUID)):
                 return a.data.__str__()
             else:
                 return a.data
