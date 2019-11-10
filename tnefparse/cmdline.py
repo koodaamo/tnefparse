@@ -8,7 +8,8 @@ from . import properties
 from .tnef import TNEF
 
 logging.basicConfig()
-logging.root.setLevel(logging.ERROR)
+logger = logging.getLogger(__package__)
+logger.setLevel(logging.ERROR)
 
 
 descr = 'Extract TNEF file contents. Show this help message if no arguments are given.'
@@ -57,7 +58,7 @@ def tnefparse():
 
     if args.logging:
         level = eval("logging." + args.logging)
-        logging.root.setLevel(level)
+        logger.setLevel(level)
 
     for tfp in args.file[0]:
         try:
@@ -82,7 +83,7 @@ def tnefparse():
                 try:
                     print("    " + properties.CODE_TO_NAME[p.name])
                 except KeyError:
-                    logging.root.warning("Unknown MAPI Property: %s" % hex(p.name))
+                    logger.warning("Unknown MAPI Property: %s" % hex(p.name))
             print("")
 
         elif args.dump:

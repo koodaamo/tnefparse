@@ -1,5 +1,9 @@
+import logging
 import warnings
 from .tnef import TNEF, TNEFAttachment, TNEFObject
+
+
+logging.getLogger(__package__).addHandler(logging.NullHandler())
 
 
 def parseFile(fileobj):

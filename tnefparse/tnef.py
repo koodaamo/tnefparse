@@ -9,7 +9,7 @@ from .codepage import Codepage
 from .mapi import decode_mapi
 from .util import typtime, bytes_to_int, checksum, uint32, uint16, uint8
 
-logger = logging.getLogger("tnef-decode")
+logger = logging.getLogger(__package__)
 
 
 class TNEFObject(object):

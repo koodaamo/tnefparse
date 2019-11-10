@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 if sys.hexversion < 0x03000000:
     range = xrange
 
-logger = logging.getLogger("tnef-decode")
+logger = logging.getLogger(__package__)
 
 
 def make_unpack(structure):
