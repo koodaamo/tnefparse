@@ -308,7 +308,7 @@ class TNEF(object):
                 obj.data = bytes_to_int(obj.data)
                 self.msgprops.append(obj)
             elif obj.type == TNEFObject.PTYPE_TIME and obj.name in (
-                TNEF.ATTDATESTART, TNEF.ATTDATEMODIFY, TNEF.ATTDATESENT, TNEF.ATTDATERECD
+                TNEF.ATTDATESTART, TNEF.ATTDATEEND, TNEF.ATTDATEMODIFY, TNEF.ATTDATESENT, TNEF.ATTDATERECD
             ):
                 try:
                     obj.data = typtime(obj.data)
