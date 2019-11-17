@@ -9,7 +9,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [2.7, 3.5, 3.6, 3.7]
+        python-version: [2.7, 3.6, 3.7]
 
     steps:
     - uses: actions/checkout@v1
@@ -34,5 +34,5 @@ jobs:
       run: |
         pip install -e .
         pip install compressed_rtf
-        pip install pytest mock==2.0.0 pytest-console-scripts
+        pip install pytest pytest-console-scripts
         pytest
