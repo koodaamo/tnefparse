@@ -34,5 +34,5 @@ jobs:
       run: |
         pip install -e .
         pip install compressed_rtf
-        pip install pytest mock
+        pip install pytest pytest-console-scripts mock
         pytest
