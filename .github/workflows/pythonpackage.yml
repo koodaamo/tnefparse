@@ -23,7 +23,7 @@ jobs:
         pip install -r requirements.txt
         
     - name: Lint Python2 code with flake8
-      if: startsWith( matrix.python-version, "2" )
+      if: startsWith( matrix.python-version, '2' )
       run: |
         pip install flake8 future-fstrings
         # stop the build if there are Python syntax errors or undefined names
@@ -32,7 +32,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
     - name: Lint Python3 code with flake8
-      if: startsWith( matrix.python-version, "3" )
+      if: startsWith( matrix.python-version, '3' )
       run: |
         pip install flake8
         # stop the build if there are Python syntax errors or undefined names
