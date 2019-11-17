@@ -4,12 +4,12 @@ import logging
 import os
 import sys
 
-from . import properties
+from . import properties, tnef
 from .tnef import TNEF
+#from tnefparse import tnef
 
 logging.basicConfig()
-logger = logging.getLogger(__package__)
-logger.setLevel(logging.ERROR)
+logging.root.setLevel(logging.ERROR)
 
 
 descr = 'Extract TNEF file contents. Show this help message if no arguments are given.'
@@ -24,6 +24,9 @@ argument('-o', '--overview', action='store_true',
 
 argument('-a', '--attachments', action='store_true',
          help='extract attachments, by default to current dir')
+         
+argument('-z', '--zip', action='store_true',
+         help='extract attachments to zip file, by default to current dir')
 
 argument('-p', '--path',
          help='optional explicit path to extract attachments to')
@@ -58,7 +61,7 @@ def tnefparse():
 
     if args.logging:
         level = eval("logging." + args.logging)
-        logger.setLevel(level)
+        logging.root.setLevel(level)
 
     for tfp in args.file[0]:
         try:
@@ -83,7 +86,7 @@ def tnefparse():
                 try:
                     print("    " + properties.CODE_TO_NAME[p.name])
                 except KeyError:
-                    logger.warning("Unknown MAPI Property: %s" % hex(p.name))
+                    logging.root.warning("Unknown MAPI Property: %s" % hex(p.name))
             print("")
 
         elif args.dump:
@@ -96,7 +99,17 @@ def tnefparse():
                     afp.write(a.data)
             sys.stderr.write("Successfully wrote %i files\n" % len(t.attachments))
             sys.exit()
-
+        
+        elif args.zip:
+            tfp.seek(0)
+            pth = args.path.rstrip(os.sep) + os.sep if args.path else ''
+            test = tfp.read()
+            a = tnef.to_zip(test)
+            with open(pth + 'attachments.zip', "wb") as afp:
+                afp.write(a)
+            sys.stderr.write("Successfully wrote attachments.zip\n")
+            sys.exit()
+            
         def print_body(attr, description):
             body = getattr(t, attr)
             if body is None:

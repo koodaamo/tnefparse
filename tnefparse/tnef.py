@@ -3,6 +3,7 @@
 import logging
 import os
 from datetime import datetime
+from uuid import UUID
 
 from . import properties as Attribute
 from .codepage import Codepage
@@ -308,7 +309,7 @@ class TNEF(object):
                 obj.data = bytes_to_int(obj.data)
                 self.msgprops.append(obj)
             elif obj.type == TNEFObject.PTYPE_TIME and obj.name in (
-                TNEF.ATTDATESTART, TNEF.ATTDATEMODIFY, TNEF.ATTDATESENT, TNEF.ATTDATERECD
+                TNEF.ATTDATESTART, TNEF.ATTDATEEND, TNEF.ATTDATEMODIFY, TNEF.ATTDATESENT, TNEF.ATTDATERECD
             ):
                 try:
                     obj.data = typtime(obj.data)
@@ -343,7 +344,7 @@ class TNEF(object):
                 return a.data.decode('ascii', errors="replace")
             elif force_strings and isinstance(a.data, tuple) and isinstance(a.data[0], bytes):
                 return [s.decode('ascii', errors="replace") for s in a.data]
-            elif force_strings and isinstance(a.data, datetime):
+            elif force_strings and (isinstance(a.data, datetime) or isinstance(a.data, UUID)):
                 return a.data.__str__()
             else:
                 return a.data

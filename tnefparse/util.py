@@ -45,8 +45,11 @@ HUNDREDS_OF_NANOSECONDS = 10000000
 
 def systime(byte_arr, offset=0):
     ft = uint64(byte_arr, offset)
-    return datetime.utcfromtimestamp((ft - EPOCH_AS_FILETIME) / HUNDREDS_OF_NANOSECONDS)
-
+    try:
+        return datetime.utcfromtimestamp((ft - EPOCH_AS_FILETIME) / HUNDREDS_OF_NANOSECONDS)
+    except:
+         microseconds = ft / 10
+         return (datetime(1601, 1, 1) + timedelta(microseconds=microseconds))
 
 def apptime(byte_arr, offset=0):
     return timedelta(dbl64(byte_arr, offset)) + OLE_TIME_ZERO
