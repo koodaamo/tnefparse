@@ -35,7 +35,7 @@ jobs:
         pip --version
         pip install -U pip
         pip --version
-        pip install -e .
+        pip install -e[test] .
         pip install compressed_rtf
         pip install 'mock==3.0.5'
         pip install pytest
