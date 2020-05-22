@@ -62,7 +62,7 @@ def tnefparse():
 
     for tfp in args.file[0]:
         try:
-            t = TNEF(tfp.read(), do_checksum=args.checksum)
+            t = TNEF(open(filename).read(), do_checksum=True)
         except ValueError as exc:
             sys.exit(exc.message)
         if args.overview:
