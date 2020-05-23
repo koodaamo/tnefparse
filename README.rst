@@ -2,13 +2,16 @@ tnefparse - TNEF decoding and attachment extraction
 ===================================================
 
 .. image:: https://badge.fury.io/py/tnefparse.png
-    :target: http://badge.fury.io/py/tnefparse
+  :target: http://badge.fury.io/py/tnefparse
 
 .. image:: https://travis-ci.org/koodaamo/tnefparse.png?branch=master
-        :target: https://travis-ci.org/koodaamo/tnefparse
+  :target: https://travis-ci.org/koodaamo/tnefparse
 
 .. image:: https://codecov.io/gh/koodaamo/tnefparse/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/koodaamo/tnefparse
+
+.. image:: https://img.shields.io/pypi/pyversions/tnefparse.svg
+  :target: https://pypi.org/project/tnefparse/
 
 This is a pure-python library for decoding Microsoft's Transport Neutral Encapsulation Format (TNEF), for Python
 versions 2.7, 3.5+ and PyPy. For more information on TNEF, see for example 
