@@ -34,7 +34,7 @@ setup(name='tnefparse',
       url='https://github.com/koodaamo/tnefparse',
       license='LGPL',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
-      tests_require = ['pytest', 'coverage', 'compressed_rtf'],
+      extras_require={'optional': ['compressed_rtf',],},
       include_package_data=True,
       zip_safe=True,
       entry_points = {

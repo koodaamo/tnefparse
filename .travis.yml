@@ -11,8 +11,9 @@ python:
   - "pypy"
 
 install:
-  - pip install -e .
-  - pip install pytest pytest-cov pytest-console-scripts codecov compressed_rtf
+  - pip install -U pip
+  - pip install -e .[optional]
+  - pip install pytest pytest-cov pytest-console-scripts codecov
 
 script:
   - pytest --cov

@@ -59,9 +59,18 @@ The parsed attachment contents are then available as TNEF object attributes:
 
 Some of the above properties may be empty, depending on what's contained in the attachment that was parsed.
 
-To run the tests, first install the package using e.g. :code:`pip install -e .` and then run :code:`python setup.py test`.
+Tests
+-----
+
+To run the test suite, all you need is tox_. `tox` will run all tests on all supported Python versions.
+
+If you want to run the tests only for e.g. Python 3.8, just enter `tox -e py38`.
+
+Contributing
+------------
 
 Issues and pull requests welcome. **Please however always provide an example TNEF file** that can be used to demonstrate the bug or desired behavior, if at all possible.
 
 **Note: If you have understanding of TNEF and/or MIME internals or just need this package and want to help with maintaining it, I am open to giving you commit rights. Just let me know.**
 
+.. _tox: https://tox.readthedocs.io/
