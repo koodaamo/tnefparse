@@ -1,14 +1,14 @@
 tnefparse - TNEF decoding and attachment extraction
 ===================================================
 
-.. image:: https://badge.fury.io/py/tnefparse.png
-  :target: http://badge.fury.io/py/tnefparse
-
 .. image:: https://travis-ci.org/koodaamo/tnefparse.png?branch=master
   :target: https://travis-ci.org/koodaamo/tnefparse
 
 .. image:: https://codecov.io/gh/koodaamo/tnefparse/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/koodaamo/tnefparse
+
+.. image:: https://img.shields.io/pypi/v/tnefparse.svg
+  :target: https://pypi.org/project/tnefparse/
 
 .. image:: https://img.shields.io/pypi/pyversions/tnefparse.svg
   :target: https://pypi.org/project/tnefparse/
