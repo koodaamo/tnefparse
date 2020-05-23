@@ -10,7 +10,7 @@ with open('HISTORY.rst') as history_file:
 
 setup(name='tnefparse',
       version=version,
-      description="a TNEF decoding library written in python, without external dependencies",
+      description="a TNEF decoding library written in Python, without external dependencies",
       long_description=readme + '\n\n' + history,
       classifiers=[
        'Topic :: Communications :: Email',
