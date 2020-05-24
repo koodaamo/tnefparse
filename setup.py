@@ -1,5 +1,4 @@
-from setuptools import setup, find_packages, Command
-import sys, os
+from setuptools import setup, find_packages
 
 version = '1.3.1.dev0'
 
@@ -11,7 +10,7 @@ with open('HISTORY.rst') as history_file:
 
 setup(name='tnefparse',
       version=version,
-      description="a TNEF decoding library written in python, without external dependencies",
+      description="a TNEF decoding library written in Python, without external dependencies",
       long_description=readme + '\n\n' + history,
       classifiers=[
        'Topic :: Communications :: Email',
@@ -35,7 +34,7 @@ setup(name='tnefparse',
       url='https://github.com/koodaamo/tnefparse',
       license='LGPL',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
-      tests_require = ['pytest', 'coverage', 'compressed_rtf'],
+      extras_require={'optional': ['compressed_rtf',],},
       include_package_data=True,
       zip_safe=True,
       entry_points = {

@@ -4,6 +4,7 @@ tnefparse 1.3.1 (unreleased)
 - heuristics to decode binary body and filenames when possible (jrideout)
 - JSON export for TNEF contents tnefparse (jrideout)
 - add support for Python 3.8 (jugmac00)
+- modernize package and test setup (jugmac00)
 
 tnefparse 1.3.0 (2018-12-01)
 =============================
@@ -17,7 +18,7 @@ tnefparse 1.3.0 (2018-12-01)
 - add tnefparse -p | --path option for setting attachment extraction path
 - support more MAPI (PidTag) properties (jrideout)
 - support RTF body extraction (jrideout)
-- support extracting top level object attributues in msgprops (jrideout)
+- support extracting top level object attributes in msgprops (jrideout)
 - util.raw_mapi & tnefparse.parseFile functions will be deprecated after 1.3
 
 tnefparse 1.2.3, 2018-11-14

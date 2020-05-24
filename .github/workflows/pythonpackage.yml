@@ -32,7 +32,6 @@ jobs:
       
     - name: Test with pytest
       run: |
-        pip install -e .
-        pip install compressed_rtf
+        pip install -e .[optional]
         pip install pytest pytest-console-scripts
         pytest
