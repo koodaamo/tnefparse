@@ -66,6 +66,11 @@ To run the test suite, all you need is tox_. `tox` will run all tests on all sup
 
 If you want to run the tests only for e.g. Python 3.8, just enter `tox -e py38`.
 
+You also can run a subset of tests in a specific environment by invoking e.g. `tox -e py38 -- -k test_cmdline`.
+
+With `tox -e coverage` you can generate a coverage report.
+The output will be shown in the terminal and a HTML coverage report will be generated in the `htmlcov` directory.
+
 Contributing
 ------------
 
