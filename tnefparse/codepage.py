@@ -5,7 +5,7 @@ CODEPAGE_MAP = {
     28591: 'iso-8859-1',
     65001: 'utf-8',
 }
-FALLBACK='cp1252'
+FALLBACK = 'cp1252'
 
 
 class Codepage(object):

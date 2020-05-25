@@ -13,10 +13,14 @@ python:
 install:
   - pip install -U pip
   - pip install -e .[optional]
-  - pip install pytest pytest-cov pytest-console-scripts codecov
+  - pip install pytest pytest-cov pytest-console-scripts codecov flake8
 
 script:
   - pytest --cov
+  # ignore max complexity and line break after binary operator
+  - flake8 tnefparse/ tests/ setup.py  --ignore=C901,W504
+  # check max complexity, but do not enforce it
+  - flake8 tnefparse/ tests/ setup.py  --count --exit-zero --max-complexity=10 --statistics
 
 after_success:
   - codecov

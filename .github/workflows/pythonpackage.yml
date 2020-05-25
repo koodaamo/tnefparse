@@ -24,11 +24,11 @@ jobs:
         
     - name: Lint Python code with flake8
       run: |
-        pip install flake8 future-fstrings
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --builtins xrange
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        pip install flake8
+        # ignore max complexity and line break after binary operator
+        flake8 tnefparse/ tests/ setup.py  --ignore=C901,W504
+        # check max complexity, but do not enforce it
+        flake8 tnefparse/ tests/ setup.py  --count --exit-zero --max-complexity=10 --statistics
       
     - name: Test with pytest
       run: |

@@ -8,7 +8,7 @@ import warnings
 from datetime import datetime, timedelta
 
 if sys.hexversion < 0x03000000:
-    range = xrange
+    range = xrange  # noqa: F821
 
 logger = logging.getLogger(__package__)
 
@@ -35,7 +35,7 @@ dbl64 = make_unpack('<d')
 
 
 def guid(byte_arr, offset=0):
-    return uuid.UUID(bytes_le=byte_arr[offset : offset + 16])
+    return uuid.UUID(bytes_le=byte_arr[offset: offset + 16])
 
 
 OLE_TIME_ZERO = datetime(1899, 12, 30)
@@ -47,9 +47,10 @@ def systime(byte_arr, offset=0):
     ft = uint64(byte_arr, offset)
     try:
         return datetime.utcfromtimestamp((ft - EPOCH_AS_FILETIME) / HUNDREDS_OF_NANOSECONDS)
-    except:
-         microseconds = ft / 10
-         return (datetime(1601, 1, 1) + timedelta(microseconds=microseconds))
+    except:  # noqa: E722
+        microseconds = ft / 10
+        return (datetime(1601, 1, 1) + timedelta(microseconds=microseconds))
+
 
 def apptime(byte_arr, offset=0):
     return timedelta(dbl64(byte_arr, offset)) + OLE_TIME_ZERO

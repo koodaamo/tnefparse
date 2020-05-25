@@ -14,36 +14,34 @@ from .util import (
     int32,
     int64,
     systime,
-    uint8,
     uint16,
     uint32,
-    uint64,
 )
 from . import properties
 
 if sys.hexversion < 0x03000000:
-    range = xrange
+    range = xrange  # noqa: F821
 
 logger = logging.getLogger("mapi-decode")
 
 
-SZMAPI_UNSPECIFIED    = 0x0000  # MAPI Unspecified
-SZMAPI_NULL           = 0x0001  # MAPI null property
-SZMAPI_SHORT          = 0x0002  # MAPI short (signed 16 bits)
-SZMAPI_INT            = 0x0003  # MAPI integer (signed 32 bits)
-SZMAPI_FLOAT          = 0x0004  # MAPI float (4 bytes)
-SZMAPI_DOUBLE         = 0x0005  # MAPI double
-SZMAPI_CURRENCY       = 0x0006  # MAPI currency (64 bits)
-SZMAPI_APPTIME        = 0x0007  # MAPI application time
-SZMAPI_ERROR          = 0x000A  # MAPI error (32 bits)
-SZMAPI_BOOLEAN        = 0x000B  # MAPI boolean (16 bits)
-SZMAPI_OBJECT         = 0x000D  # MAPI embedded object
-SZMAPI_INT8BYTE       = 0x0014  # MAPI 8 byte signed int
-SZMAPI_STRING         = 0x001E  # MAPI string
-SZMAPI_UNICODE_STRING = 0x001F  # MAPI unicode-string (null terminated)
-SZMAPI_SYSTIME        = 0x0040  # MAPI time (64 bits)
-SZMAPI_CLSID          = 0x0048  # MAPI OLE GUID
-SZMAPI_BINARY         = 0x0102  # MAPI binary
+SZMAPI_UNSPECIFIED    = 0x0000  # MAPI Unspecified  # noqa: E221
+SZMAPI_NULL           = 0x0001  # MAPI null property  # noqa: E221
+SZMAPI_SHORT          = 0x0002  # MAPI short (signed 16 bits)  # noqa: E221
+SZMAPI_INT            = 0x0003  # MAPI integer (signed 32 bits)  # noqa: E221
+SZMAPI_FLOAT          = 0x0004  # MAPI float (4 bytes)  # noqa: E221
+SZMAPI_DOUBLE         = 0x0005  # MAPI double  # noqa: E221
+SZMAPI_CURRENCY       = 0x0006  # MAPI currency (64 bits)  # noqa: E221
+SZMAPI_APPTIME        = 0x0007  # MAPI application time  # noqa: E221
+SZMAPI_ERROR          = 0x000A  # MAPI error (32 bits)  # noqa: E221
+SZMAPI_BOOLEAN        = 0x000B  # MAPI boolean (16 bits)  # noqa: E221
+SZMAPI_OBJECT         = 0x000D  # MAPI embedded object  # noqa: E221
+SZMAPI_INT8BYTE       = 0x0014  # MAPI 8 byte signed int  # noqa: E221
+SZMAPI_STRING         = 0x001E  # MAPI string  # noqa: E221
+SZMAPI_UNICODE_STRING = 0x001F  # MAPI unicode-string (null terminated)  # noqa: E221
+SZMAPI_SYSTIME        = 0x0040  # MAPI time (64 bits)  # noqa: E221
+SZMAPI_CLSID          = 0x0048  # MAPI OLE GUID  # noqa: E221
+SZMAPI_BINARY         = 0x0102  # MAPI binary  # noqa: E221
 SZMAPI_BEATS_THE_HELL_OUTTA_ME = 0x0033
 
 MULTI_VALUE_FLAG = 0x1000
@@ -56,7 +54,8 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
     dataLen = len(data)
     attrs = []
     offset = starting_offset or 0
-    num_properties = uint32(data, offset); offset += 4
+    num_properties = uint32(data, offset)
+    offset += 4
 
     try:
         for i in range(num_properties):
@@ -64,8 +63,10 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
                 logger.warn("Skipping property '%i'" % i)
                 continue
 
-            attr_type = uint16(data, offset); offset += 2
-            attr_name = uint16(data, offset); offset += 2
+            attr_type = uint16(data, offset)
+            offset += 2
+            attr_name = uint16(data, offset)
+            offset += 2
 
             # logger.debug("Attribute type: 0x%4.4x", attr_type)
             # logger.debug("Attribute name: 0x%4.4x", attr_name)
@@ -73,22 +74,27 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
             guid_name = None
             guid_prop = None
             if attr_name >= GUID_EXISTS_FLAG:
-                guid_id = guid(data, offset); offset += 16
-                kind = uint32(data, offset); offset += 4
+                guid_id = guid(data, offset)
+                offset += 16
+                kind = uint32(data, offset)
+                offset += 4
                 if kind == 0:
-                    guid_prop = uint32(data, offset); offset += 4
+                    guid_prop = uint32(data, offset)
+                    offset += 4
                 else:
-                    iidLen = uint32(data, offset); offset += 4
+                    iidLen = uint32(data, offset)
+                    offset += 4
                     r = iidLen % 4
                     if r != 0:
                         iidLen += 4 - r
-                    guid_name = data[offset : offset + iidLen].decode('utf-16')
+                    guid_name = data[offset: offset + iidLen].decode('utf-16')
                     offset += iidLen
 
             num_mv_properties = None
             if MULTI_VALUE_FLAG & attr_type:
                 attr_type ^= MULTI_VALUE_FLAG
-                num_mv_properties = uint32(data, offset); offset += 4
+                num_mv_properties = uint32(data, offset)
+                offset += 4
 
             for mv in range(num_mv_properties or 1):
                 try:
@@ -121,31 +127,37 @@ def parse_property(data, offset, attr_name, attr_type, codepage, is_multi):
     attr_data = None
 
     if attr_type in (SZMAPI_SHORT, SZMAPI_BOOLEAN):
-        attr_data = data[offset : offset + 2]; offset += 2
+        attr_data = data[offset: offset + 2]
+        offset += 2
     elif attr_type in (SZMAPI_INT, SZMAPI_FLOAT, SZMAPI_ERROR):
-        attr_data = data[offset : offset + 4]; offset += 4
+        attr_data = data[offset: offset + 4]
+        offset += 4
     elif attr_type in (SZMAPI_DOUBLE, SZMAPI_APPTIME, SZMAPI_CURRENCY, SZMAPI_INT8BYTE, SZMAPI_SYSTIME):
-        attr_data = data[offset : offset + 8]; offset += 8
+        attr_data = data[offset: offset + 8]
+        offset += 8
     elif attr_type == SZMAPI_CLSID:
-        attr_data = data[offset : offset + 16]; offset += 16
+        attr_data = data[offset: offset + 16]
+        offset += 16
     elif attr_type in (SZMAPI_STRING, SZMAPI_UNICODE_STRING, SZMAPI_OBJECT, SZMAPI_BINARY, SZMAPI_UNSPECIFIED):
         if is_multi:
             num_vals = 1
         else:
-            num_vals = uint32(data, offset); offset += 4
+            num_vals = uint32(data, offset)
+            offset += 4
 
         attr_data = []
         for j in range(num_vals):
-            length = uint32(data, offset); offset += 4
+            length = uint32(data, offset)
+            offset += 4
             r = length % 4
             if r != 0:
                 length += 4 - r
             if attr_type == SZMAPI_UNICODE_STRING:
-                attr_data.append(data[offset : offset + length].decode('utf-16'))
+                attr_data.append(data[offset: offset + length].decode('utf-16'))
             elif attr_type == SZMAPI_STRING:
-                attr_data.append(data[offset : offset + length].decode(codepage))
+                attr_data.append(data[offset: offset + length].decode(codepage))
             else:
-                attr_data.append(data[offset : offset + length])
+                attr_data.append(data[offset: offset + length])
             offset += length
 
     else:
