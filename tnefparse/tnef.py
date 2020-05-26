@@ -15,9 +15,9 @@ logger = logging.getLogger(__package__)
 
 class TNEFObject(object):
     "a TNEF object that may contain a property and an attachment"
-    PTYPE_CLASS  = 0x1
-    PTYPE_TIME   = 0x3
-    PTYPE_STRING = 0x7
+    PTYPE_CLASS  = 0x1  # noqa: E221
+    PTYPE_TIME   = 0x3  # noqa: E221
+    PTYPE_STRING = 0x7  # noqa: E221
 
     def __init__(self, data, do_checksum=False):
         self.length = len(data)
@@ -25,7 +25,7 @@ class TNEFObject(object):
         self.name = uint16(data, 1)
         self.type = uint16(data, 3)
         self.length = min(self.length, uint32(data, 5) + 11)
-        self.data = data[9 : self.length - 2]
+        self.data = data[9: self.length - 2]
         att_checksum = uint16(data, self.length - 2)
 
         if do_checksum:
@@ -383,8 +383,8 @@ def triples(data):
     # struct_length = uint16(data, 2)
     sender_length = uint16(data, 4)
     email_length = uint16(data, 6)
-    sender = data[8 : 8 + sender_length]
-    etype_email = data[8 + sender_length : 8 + sender_length + email_length]
+    sender = data[8: 8 + sender_length]
+    etype_email = data[8 + sender_length: 8 + sender_length + email_length]
     etype, email = etype_email.split(b':', 1)
 
     return sender.rstrip(b'\x00'), etype, email.rstrip(b'\x00')

@@ -5,6 +5,7 @@ tnefparse 1.3.1 (unreleased)
 - JSON export for TNEF contents tnefparse (jrideout)
 - add support for Python 3.8 (jugmac00)
 - modernize package and test setup (jugmac00)
+- apply Flake8 on the code and enforce rules on CI (jugmac00)
 
 tnefparse 1.3.0 (2018-12-01)
 =============================

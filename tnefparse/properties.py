@@ -33,7 +33,7 @@ Property reference docs:
 |                |                |   some of the address book tagged properties (those with names beginning with |
 |                |                |   PIDTagAddressBook). Many are static property IDs but are in this range.     |
 +----------------+----------------+-------------------------------------------------------------------------------+
-"""
+"""  # noqa: E501
 
 
 MAPI_ACKNOWLEDGEMENT_MODE = 0x0001
