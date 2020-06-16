@@ -161,7 +161,7 @@ class TNEF(object):
     ATTFROM = 0x8000  # From
     ATTSUBJECT = 0x8004  # Subject
     ATTDATESENT = 0x8005  # Date Sent
-    ATTDATERECD = 0x8006  # Date Recieved
+    ATTDATERECD = 0x8006  # Date Received
     ATTMESSAGESTATUS = 0x8007  # Message Status
     ATTMESSAGECLASS = 0x8008  # Message Class
     ATTMESSAGEID = 0x8009  # Message ID
