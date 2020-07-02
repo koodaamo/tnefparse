@@ -13,7 +13,7 @@ python:
 install:
   - pip install -U pip
   - pip install -e .[optional]
-  - pip install pytest pytest-cov pytest-console-scripts codecov flake8
+  - pip install -U pytest pytest-cov pytest-console-scripts codecov flake8
 
 script:
   - pytest --cov
