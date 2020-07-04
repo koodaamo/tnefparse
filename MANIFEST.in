@@ -5,3 +5,7 @@ include LICENSE
 include tox.ini
 recursive-include tests *.py
 recursive-include tests *.tnef
+
+include *.py
+recursive-include scripts *.py
+recursive-include data *.txt
