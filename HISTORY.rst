@@ -1,4 +1,4 @@
-tnefparse 1.3.1 (unreleased)
+tnefparse 1.3.1 (2020-09-30)
 =============================
 
 - heuristics to decode binary body and filenames when possible (jrideout)
