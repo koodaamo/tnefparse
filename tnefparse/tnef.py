@@ -31,7 +31,7 @@ class TNEFObject:
         if do_checksum:
             calc_checksum = checksum(self.data)
             if calc_checksum != att_checksum:
-                logger.warning("Checksum: {} != {}".format(calc_checksum, att_checksum))
+                logger.warning(f"Checksum: {calc_checksum} != {att_checksum}")
         else:
             calc_checksum = att_checksum
 
@@ -43,7 +43,7 @@ class TNEFObject:
         return TNEF.codes.get(self.name)
 
     def __str__(self):
-        return "<{} '{}'>".format(self.__class__.__name__, self.name_str)
+        return f"<{self.__class__.__name__} '{self.name_str}'>"
 
 
 class TNEFAttachment:
@@ -336,7 +336,7 @@ class TNEF:
 
     def __str__(self):
         atts = (", %i attachments" % len(self.attachments)) if self.attachments else ''
-        return "<{}:0x{:2.2x}{}>".format(self.__class__.__name__, self.key, atts)
+        return f"<{self.__class__.__name__}:0x{self.key:2.2x}{atts}>"
 
     def dump(self, force_strings=False):
         def get_data(a):
