@@ -162,7 +162,7 @@ def parse_property(data, offset, attr_name, attr_type, codepage, is_multi):
     return attr_data, offset
 
 
-class TNEFMAPI_Attribute(object):
+class TNEFMAPI_Attribute:
     """represents a mapi attribute
 
     Property reference docs:

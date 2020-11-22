@@ -8,7 +8,7 @@ CODEPAGE_MAP = {
 FALLBACK = 'cp1252'
 
 
-class Codepage(object):
+class Codepage:
     def __init__(self, codepage):
         self.cp = codepage
 

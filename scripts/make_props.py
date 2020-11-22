@@ -1,5 +1,3 @@
-# -*- coding: future_fstrings -*-
-
 """
 Tool to regenerate tnefparse/properties.py
 
@@ -13,7 +11,7 @@ from collections import OrderedDict
 
 properties = OrderedDict()
 
-with open('data/properties.txt', 'r') as props:
+with open('data/properties.txt') as props:
     for prop in props:
         prop = prop.strip()
         if not prop or prop.startswith('#'):
