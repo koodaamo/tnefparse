@@ -2,7 +2,6 @@
 """
 import logging
 import struct
-import sys
 import uuid
 import warnings
 from datetime import datetime, timedelta

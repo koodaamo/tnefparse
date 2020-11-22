@@ -1,7 +1,6 @@
 "MAPI attribute definitions"
 
 import logging
-import sys
 from decimal import Decimal
 
 from .util import (
