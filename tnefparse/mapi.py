@@ -19,9 +19,6 @@ from .util import (
 )
 from . import properties
 
-if sys.hexversion < 0x03000000:
-    range = xrange  # noqa: F821
-
 logger = logging.getLogger("mapi-decode")
 
 

@@ -7,9 +7,6 @@ import uuid
 import warnings
 from datetime import datetime, timedelta
 
-if sys.hexversion < 0x03000000:
-    range = xrange  # noqa: F821
-
 logger = logging.getLogger(__package__)
 
 
@@ -64,24 +61,9 @@ def typtime(byte_arr, offset=0):
     return datetime(*parts)
 
 
-def bytes_to_int_py3(byte_arr):
-    "transform multi-byte values into integers, python3 version"
+def bytes_to_int(byte_arr):
+    "transform multi-byte values into integers"
     return int.from_bytes(byte_arr, byteorder="little", signed=False)
-
-
-def bytes_to_int_py2(byte_arr):
-    "transform multi-byte values into integers, python2 version"
-    n = num = 0
-    for b in byte_arr:
-        num += ord(b) << n
-        n += 8
-    return num
-
-
-if sys.hexversion > 0x03000000:
-    bytes_to_int = bytes_to_int_py3
-else:
-    bytes_to_int = bytes_to_int_py2
 
 
 def checksum(data):
