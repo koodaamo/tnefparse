@@ -1,8 +1,8 @@
 
-tnefparse 1.x.x (unreleased)
+tnefparse 1.4.0 (unreleased)
 =============================
 
-- nothing yet
+- drop Python2 support
 
 tnefparse 1.3.1 (2020-09-30)
 =============================
