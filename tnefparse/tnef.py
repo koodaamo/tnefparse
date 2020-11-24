@@ -13,7 +13,7 @@ from .util import typtime, bytes_to_int, checksum, uint32, uint16, uint8
 logger = logging.getLogger(__package__)
 
 
-class TNEFObject(object):
+class TNEFObject:
     "a TNEF object that may contain a property and an attachment"
     PTYPE_CLASS  = 0x1  # noqa: E221
     PTYPE_TIME   = 0x3  # noqa: E221
@@ -31,7 +31,7 @@ class TNEFObject(object):
         if do_checksum:
             calc_checksum = checksum(self.data)
             if calc_checksum != att_checksum:
-                logger.warning("Checksum: %s != %s" % (calc_checksum, att_checksum))
+                logger.warning(f"Checksum: {calc_checksum} != {att_checksum}")
         else:
             calc_checksum = att_checksum
 
@@ -43,10 +43,10 @@ class TNEFObject(object):
         return TNEF.codes.get(self.name)
 
     def __str__(self):
-        return "<%s '%s'>" % (self.__class__.__name__, self.name_str)
+        return f"<{self.__class__.__name__} '{self.name_str}'>"
 
 
-class TNEFAttachment(object):
+class TNEFAttachment:
     "a TNEF attachment"
 
     SZMAPI_UNSPECIFIED = 0x0000  # MAPI Unspecified
@@ -143,7 +143,7 @@ class TNEFAttachment(object):
         return "<ATTCH:'%s'>" % self.long_filename()
 
 
-class TNEF(object):
+class TNEF:
     "main decoder class - start by using this"
 
     TNEF_SIGNATURE = 0x223E9F78
@@ -336,7 +336,7 @@ class TNEF(object):
 
     def __str__(self):
         atts = (", %i attachments" % len(self.attachments)) if self.attachments else ''
-        return "<%s:0x%2.2x%s>" % (self.__class__.__name__, self.key, atts)
+        return f"<{self.__class__.__name__}:0x{self.key:2.2x}{atts}>"
 
     def dump(self, force_strings=False):
         def get_data(a):
@@ -390,7 +390,7 @@ def triples(data):
     return sender.rstrip(b'\x00'), etype, email.rstrip(b'\x00')
 
 
-def to_zip(data, default_name=u'no-name', deflate=True):
+def to_zip(data, default_name='no-name', deflate=True):
     "Convert attachments in TNEF data to zip format. Accepts and returns str type."
     # Parse the TNEF data
     tnef = TNEF(data)

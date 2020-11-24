@@ -47,7 +47,7 @@ SPECS = (
     ("unicode-mapi-attr-name.tnef", 0x69ec,
      ['spaconsole2.cfg', 'image001.png', 'image002.png', 'image003.png'], 'htmlbody', []),
     ("unicode-mapi-attr.tnef", 0x408f, ['example.dat'], 'body', []),
-    ("umlaut.tnef", 0xa2e, ['TBZ PARIV GmbH.jpg', 'image003.jpg', u'UmlautAnhang-\xe4\xfc\xf6.txt'], 'rtfbody', []),
+    ("umlaut.tnef", 0xa2e, ['TBZ PARIV GmbH.jpg', 'image003.jpg', 'UmlautAnhang-\xe4\xfc\xf6.txt'], 'rtfbody', []),
     ("bad_checksum.tnef", 0x5784, ['image001.png'], 'body', []),
 )
 

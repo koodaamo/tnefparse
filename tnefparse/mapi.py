@@ -1,7 +1,6 @@
 "MAPI attribute definitions"
 
 import logging
-import sys
 from decimal import Decimal
 
 from .util import (
@@ -18,9 +17,6 @@ from .util import (
     uint32,
 )
 from . import properties
-
-if sys.hexversion < 0x03000000:
-    range = xrange  # noqa: F821
 
 logger = logging.getLogger("mapi-decode")
 
@@ -166,7 +162,7 @@ def parse_property(data, offset, attr_name, attr_type, codepage, is_multi):
     return attr_data, offset
 
 
-class TNEFMAPI_Attribute(object):
+class TNEFMAPI_Attribute:
     """represents a mapi attribute
 
     Property reference docs:
