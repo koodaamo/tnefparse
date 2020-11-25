@@ -144,7 +144,7 @@ class TNEFAttachment:
             logger.debug("Unknown attribute name: %s", attribute)
 
     def __str__(self):
-        return "<ATTCH:'%s'>" % self.long_filename()
+        return f"<ATTCH:{self.long_filename()}>"
 
 
 class TNEF:
@@ -228,7 +228,7 @@ class TNEF:
     def __init__(self, data, do_checksum=True):
         self.signature = uint32(data)
         if self.signature != TNEF.TNEF_SIGNATURE:
-            raise ValueError("Wrong TNEF signature: 0x%2.8x" % self.signature)
+            raise ValueError(f"Wrong TNEF signature: {self.signature:#010x}")
         self.key = uint16(data, 4)
         self.codepage = None
         self.objects = []
@@ -340,7 +340,7 @@ class TNEF:
             return None
 
     def __str__(self):
-        atts = (", %i attachments" % len(self.attachments)) if self.attachments else ''
+        atts = f", {len(self.attachments)} attachments" if self.attachments else ''
         return f"<{self.__class__.__name__}:0x{self.key:02x}{atts}>"
 
     def dump(self, force_strings=False):

@@ -69,7 +69,7 @@ def tnefparse() -> None:
         except ValueError as exc:
             sys.exit(str(exc))
         if args.overview:
-            print("\nOverview of %s: \n" % tfp.name)
+            print(f"\nOverview of {tfp.name}: \n")
 
             # list TNEF attachments
             print("  Attachments:\n")
@@ -111,7 +111,7 @@ def tnefparse() -> None:
         def print_body(attr: str, description: str) -> None:
             body = getattr(t, attr)
             if body is None:
-                sys.exit("No %s found" % description)
+                sys.exit(f"No {description} found")
             elif isinstance(body, bytes):
                 sys.stdout.write(body.decode('latin-1'))
             else:
