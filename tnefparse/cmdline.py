@@ -83,7 +83,7 @@ def tnefparse():
                 try:
                     print("    " + properties.CODE_TO_NAME[p.name])
                 except KeyError:
-                    logger.warning("Unknown MAPI Property: %s" % hex(p.name))
+                    logger.warning("Unknown MAPI Property: 0x%x", p.name)
             print("")
 
         elif args.dump:

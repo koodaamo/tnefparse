@@ -56,7 +56,7 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
     try:
         for i in range(num_properties):
             if offset >= dataLen:
-                logger.warn("Skipping property '%i'" % i)
+                logger.warn("Skipping property %r", i)
                 continue
 
             attr_type = uint16(data, offset)

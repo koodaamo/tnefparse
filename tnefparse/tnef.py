@@ -31,7 +31,7 @@ class TNEFObject:
         if do_checksum:
             calc_checksum = checksum(self.data)
             if calc_checksum != att_checksum:
-                logger.warning(f"Checksum: {calc_checksum} != {att_checksum}")
+                logger.warning("Checksum: %s != %s", calc_checksum, att_checksum)
         else:
             calc_checksum = att_checksum
 
@@ -137,7 +137,7 @@ class TNEFAttachment:
             pass
             # this is a WMF file of some kind
         else:
-            logger.debug("Unknown attribute name: %s" % attribute)
+            logger.debug("Unknown attribute name: %s", attribute)
 
     def __str__(self):
         return "<ATTCH:'%s'>" % self.long_filename()
@@ -315,9 +315,9 @@ class TNEF:
                     obj.data = typtime(obj.data)
                     self.msgprops.append(obj)
                 except ValueError:
-                    logger.debug("TNEF Object not a valid date: %s" % obj)
+                    logger.debug("TNEF Object not a valid date: %s", obj)
             else:
-                logger.debug("Unhandled TNEF Object: %s" % obj)
+                logger.debug("Unhandled TNEF Object: %s", obj)
 
     def has_body(self):
         return True if (self.body or self.htmlbody or self._rtfbody) else False
