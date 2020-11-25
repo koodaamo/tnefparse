@@ -85,7 +85,7 @@ def test_dump(script_runner):
     ret = script_runner.run('tnefparse', '-d', 'tests/examples/two-files.tnef')
     assert ret.success
     dump = json.loads(ret.stdout)
-    assert sorted(list(dump.keys())) == ['attachments', 'attributes', 'extended_attributes']
+    assert sorted(dump) == ['attachments', 'attributes', 'extended_attributes']
     assert len(dump['attachments']) == 2
 
 
