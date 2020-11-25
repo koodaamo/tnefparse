@@ -77,25 +77,23 @@ def raw_mapi(dataLen, data):
     while loop <= dataLen:
         if (loop + 16) < dataLen:
             logger.debug(
-                "%2.2x%2.2x %2.2x%2.2x %2.2x%2.2x %2.2x%2.2x %2.2x%2.2x %2.2x%2.2x %2.2x%2.2x %2.2x%2.2x"
-                % (
-                    ord(data[loop]),
-                    ord(data[loop + 1]),
-                    ord(data[loop + 2]),
-                    ord(data[loop + 3]),
-                    ord(data[loop + 4]),
-                    ord(data[loop + 5]),
-                    ord(data[loop + 6]),
-                    ord(data[loop + 7]),
-                    ord(data[loop + 8]),
-                    ord(data[loop + 9]),
-                    ord(data[loop + 10]),
-                    ord(data[loop + 11]),
-                    ord(data[loop + 12]),
-                    ord(data[loop + 13]),
-                    ord(data[loop + 14]),
-                    ord(data[loop + 15]),
-                )
+                "%2.2x%2.2x %2.2x%2.2x %2.2x%2.2x %2.2x%2.2x %2.2x%2.2x %2.2x%2.2x %2.2x%2.2x %2.2x%2.2x",
+                ord(data[loop]),
+                ord(data[loop + 1]),
+                ord(data[loop + 2]),
+                ord(data[loop + 3]),
+                ord(data[loop + 4]),
+                ord(data[loop + 5]),
+                ord(data[loop + 6]),
+                ord(data[loop + 7]),
+                ord(data[loop + 8]),
+                ord(data[loop + 9]),
+                ord(data[loop + 10]),
+                ord(data[loop + 11]),
+                ord(data[loop + 12]),
+                ord(data[loop + 13]),
+                ord(data[loop + 14]),
+                ord(data[loop + 15]),
             )
         loop += 16
     loop -= 16
@@ -106,4 +104,4 @@ def raw_mapi(dataLen, data):
         if i != 0 and subr == 0:
             strList.append(' ')
         strList.append('%2.2x' % ord(data[loop + i]))
-    logger.debug('%s' % ''.join(strList))
+    logger.debug(''.join(strList))
