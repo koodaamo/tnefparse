@@ -60,8 +60,7 @@ def tnefparse() -> None:
     args = parser.parse_args()
 
     if args.logging:
-        level = eval("logging." + args.logging)
-        logger.setLevel(level)
+        logger.setLevel(getattr(logging, args.logging))
 
     for tfp in args.file[0]:
         try:
