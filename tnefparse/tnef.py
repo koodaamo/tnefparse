@@ -1,7 +1,6 @@
 """extracts TNEF encoded content from for example winmail.dat attachments.
 """
 import logging
-import os
 import warnings
 from typing import Union
 from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
@@ -324,7 +323,7 @@ class TNEF:
                 logger.debug("Unhandled TNEF Object: %s", obj)
 
     def has_body(self):
-        return True if (self.body or self.htmlbody or self._rtfbody) else False
+        return any((self.body, self.htmlbody, self._rtfbody))
 
     @property
     def rtfbody(self):
@@ -368,9 +367,7 @@ class TNEF:
             if o.name == TNEF.ATTRECIPTABLE:
                 data = []
                 for recipient in o.data:
-                    rec = {}
-                    for att in recipient:
-                        rec[att.name_str] = get_data(att)
+                    rec = {att.name_str: get_data(att) for att in recipient}
                     data.append(rec)
             out['attributes'][o.name_str] = data
         for att in self.mapiprops:
@@ -407,20 +404,17 @@ def to_zip(tnef: Union[TNEF, bytes], default_name='no-name', deflate=True):
     tozip = {}
     for attachment in tnef.attachments:
         filename = attachment.name or default_name
-        L = len(tozip.get(filename, []))
-        if L > 0:
+        if tozip.get(filename):
+            length = len(tozip.get(filename))
             # uniqify this file name by adding -<num> before the extension
-            root, ext = os.path.splitext(filename)
-            tozip[filename].append((attachment.data, str("%s-%d%s" % (root, L + 1, ext))))
-        else:
-            tozip[filename] = [(attachment.data, filename)]
+            filename = filename.with_stem(f"{filename.stem}-{length + 1}")
+        tozip[filename] = [(attachment.data, filename)]
 
     # Add each attachment to the zip file
     sfp = BytesIO()
     with ZipFile(sfp, "w", ZIP_DEFLATED if deflate else ZIP_STORED) as zf:
-        for filename, entries in list(tozip.items()):
-            for entry in entries:
-                data, name = entry
+        for filename, entries in tozip.items():
+            for data, name in entries:
                 zf.writestr(name, data)
 
     # Return the binary data for the zip file

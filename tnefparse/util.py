@@ -44,7 +44,7 @@ def systime(byte_arr, offset=0):
         return datetime.utcfromtimestamp((ft - EPOCH_AS_FILETIME) / HUNDREDS_OF_NANOSECONDS)
     except:  # noqa: E722
         microseconds = ft / 10
-        return (datetime(1601, 1, 1) + timedelta(microseconds=microseconds))
+        return datetime(1601, 1, 1) + timedelta(microseconds=microseconds)
 
 
 def apptime(byte_arr, offset=0):
