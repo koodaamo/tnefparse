@@ -1,3 +1,4 @@
+import os
 import json
 import shutil
 import sys
@@ -21,6 +22,15 @@ def test_cmdline_attch_extract(script_runner):
     tmpdir = tempfile.mkdtemp()
     ret = script_runner.run('tnefparse', '-a', '-p', tmpdir, 'tests/examples/one-file.tnef')
     assert ret.stderr == 'Successfully wrote 1 files\n'
+    assert ret.success
+    shutil.rmtree(tmpdir)
+
+
+def test_cmdline_zip_extract(script_runner):
+    tmpdir = tempfile.mkdtemp()
+    ret = script_runner.run('tnefparse', '-z', '-p', tmpdir, 'tests/examples/one-file.tnef')
+    assert os.path.isfile(tmpdir + '/attachments.zip')
+    assert ret.stderr == 'Successfully wrote attachments.zip\n'
     assert ret.success
     shutil.rmtree(tmpdir)
 
