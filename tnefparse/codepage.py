@@ -18,7 +18,7 @@ class Codepage:
         if CODEPAGE_MAP.get(self.cp):
             return CODEPAGE_MAP.get(self.cp)
         elif self.cp <= 1258:  # max cpXXXX page in python
-            return 'cp%d' % self.cp
+            return f"cp{self.cp}"
         else:
             return None
 
@@ -27,7 +27,7 @@ class Codepage:
         if bg:
             return bg
         else:
-            return 'cp%d' % self.cp
+            return f"cp{self.cp}"
 
     def decode(self, byte_str: Union[str, bytes]) -> str:
         if isinstance(byte_str, bytes):

@@ -154,7 +154,7 @@ def parse_property(data, offset, attr_name, attr_type, codepage, is_multi):
             offset += length
 
     else:
-        raise ValueError("Unknown MAPI type 0x%4.4x" % attr_type)
+        raise ValueError(f"Unknown MAPI type {attr_type:#06x}")
 
     return attr_data, offset
 
