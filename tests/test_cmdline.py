@@ -1,6 +1,12 @@
 import json
 import shutil
+import sys
 import tempfile
+from unittest.mock import patch
+
+import pytest
+
+import tnefparse.cmdline
 
 
 def test_cmdline_overview(script_runner):
@@ -64,3 +70,15 @@ def test_dump(script_runner):
     dump = json.loads(ret.stdout)
     assert sorted(list(dump.keys())) == ['attachments', 'attributes', 'extended_attributes']
     assert len(dump['attachments']) == 2
+
+
+@patch.object(sys, 'argv', ['tnefparse', 'tests/examples/two-files.tnef'])
+@patch.object(tnefparse.cmdline, "TNEF")
+def test_handle_value_errors(mocked_TNEF):
+    """Make sure e.g. invalid TNEF signatures are handled"""
+    # If there is a suitable TNEF file with an e.g. invalid TNEF signature,
+    # this test should be updated.
+    mocked_TNEF.side_effect = ValueError("Value not allowed.")
+    with pytest.raises(SystemExit):
+        from tnefparse.cmdline import tnefparse
+        tnefparse()

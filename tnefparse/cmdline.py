@@ -64,7 +64,7 @@ def tnefparse():
         try:
             t = TNEF(tfp.read(), do_checksum=args.checksum)
         except ValueError as exc:
-            sys.exit(exc.message)
+            sys.exit(str(exc))
         if args.overview:
             print("\nOverview of %s: \n" % tfp.name)
 
