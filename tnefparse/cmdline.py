@@ -26,7 +26,7 @@ argument('-a', '--attachments', action='store_true',
          help='extract attachments, by default to current dir')
 
 argument('-z', '--zip', action='store_true',
-         help='extract attachments to zip file, by default to current dir')
+         help='extract attachments into a single zip file, by default to current dir')
 
 argument('-p', '--path',
          help='optional explicit path to extract attachments to')
