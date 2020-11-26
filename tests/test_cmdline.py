@@ -2,6 +2,7 @@ import os
 import io
 import zipfile
 import json
+import logging
 import shutil
 import sys
 import tempfile
@@ -115,3 +116,29 @@ def test_print_overview(script_runner):
     assert "Attachments" in ret.stdout
     assert "Objects" in ret.stdout
     assert "Properties" in ret.stdout
+
+
+def test_cmdline_logging_info(caplog, capsys):
+    """Logging level set to INFO returns some INFO log messages"""
+    retv = tnefparse.cmdline.tnefparse(('-l', 'INFO', '-rb', 'tests/examples/rtf.tnef'))
+    assert not retv
+    stdout, _ = capsys.readouterr()
+    assert len(stdout) == 593
+    assert caplog.record_tuples == [
+        ('tnefparse', logging.INFO, 'Skipping checksum for performance'),
+    ]
+
+
+def test_cmdline_logging_warn(caplog, capsys):
+    """Logging level set to WARN returns no INFO log messages"""
+    retv = tnefparse.cmdline.tnefparse(('-l', 'WARN', '-rb', 'tests/examples/rtf.tnef'))
+    assert not retv
+    stdout, _ = capsys.readouterr()
+    assert len(stdout) == 593
+    assert caplog.record_tuples == []
+
+
+def test_cmdline_logging_illegal():
+    """Logging level set to ILLEGAL is illegal"""
+    with pytest.raises(SystemExit):
+        tnefparse.cmdline.tnefparse(('-l', 'ILLEGAL', '-rb', 'tests/examples/rtf.tnef'))
