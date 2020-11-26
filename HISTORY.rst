@@ -6,6 +6,7 @@ tnefparse 1.4.0 (unreleased)
 - drop Python 3.5 support (jugmac00)
 - add Python 3.9 support (jugmac00)
 - command-line support for zipped export of attachments (Beercow)
+- introduce using type annotations (jugmac00)
 
 tnefparse 1.3.1 (2020-09-30)
 =============================

@@ -56,7 +56,7 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
     try:
         for i in range(num_properties):
             if offset >= dataLen:
-                logger.warn("Skipping property '%i'" % i)
+                logger.warn("Skipping property %r", i)
                 continue
 
             attr_type = uint16(data, offset)
@@ -106,12 +106,9 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
             if (num_mv_properties or 1) % 2 and attr_type in (SZMAPI_SHORT, SZMAPI_BOOLEAN):
                 offset += 2
 
-    except Exception as e:
-        import traceback
-
-        stack = traceback.format_exc()
-        logger.error('decode_mapi Exception %s' % e)
-        logger.debug(stack)
+    except Exception as exc:
+        logger.error('decode_mapi exception: %s', exc)
+        logger.debug('exception details:', exc_info=True)
 
     if starting_offset is not None:
         return (offset, attrs)
