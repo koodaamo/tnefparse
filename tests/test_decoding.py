@@ -105,6 +105,7 @@ def test_decode(tnefspec):
 
 
 def test_zip():
+    # remove this test once tnef.to_zip(bytes) is no longer supported
     with open(datadir + os.sep + 'one-file.tnef', "rb") as tfile:
         zip_data = to_zip(tfile.read())
         with tempfile.TemporaryFile() as out:
