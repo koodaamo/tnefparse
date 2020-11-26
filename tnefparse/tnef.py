@@ -6,7 +6,6 @@ import warnings
 from typing import Union
 from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
 from io import BytesIO
-from functools import singledispatch
 from datetime import datetime
 from uuid import UUID
 
@@ -394,7 +393,8 @@ def triples(data):
 
     return sender.rstrip(b'\x00'), etype, email.rstrip(b'\x00')
 
-def to_zip(tnef:Union[TNEF, bytes], default_name='no-name', deflate=True):
+
+def to_zip(tnef: Union[TNEF, bytes], default_name='no-name', deflate=True):
     "Convert attachments in TNEF data to zip format."
 
     if isinstance(tnef, bytes):
@@ -424,4 +424,3 @@ def to_zip(tnef:Union[TNEF, bytes], default_name='no-name', deflate=True):
 
     # Return the binary data for the zip file
     return sfp.getvalue()
-
