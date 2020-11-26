@@ -1,3 +1,5 @@
+from typing import Optional, Union
+
 # https://docs.microsoft.com/en-us/windows/desktop/intl/code-page-identifiers
 CODEPAGE_MAP = {
     20127: 'ascii',
@@ -9,10 +11,10 @@ FALLBACK = 'cp1252'
 
 
 class Codepage:
-    def __init__(self, codepage):
+    def __init__(self, codepage: int) -> None:
         self.cp = codepage
 
-    def best_guess(self):
+    def best_guess(self) -> Optional[str]:
         if CODEPAGE_MAP.get(self.cp):
             return CODEPAGE_MAP.get(self.cp)
         elif self.cp <= 1258:  # max cpXXXX page in python
@@ -20,14 +22,14 @@ class Codepage:
         else:
             return None
 
-    def codepage(self):
+    def codepage(self) -> str:
         bg = self.best_guess()
         if bg:
             return bg
         else:
             return 'cp%d' % self.cp
 
-    def decode(self, byte_str):
+    def decode(self, byte_str: Union[str, bytes]) -> str:
         if isinstance(byte_str, bytes):
             return byte_str.decode(self.best_guess() or FALLBACK)
         else:
