@@ -1,4 +1,6 @@
 import os
+import io
+import zipfile
 import json
 import shutil
 import sys
@@ -31,6 +33,10 @@ def test_cmdline_zip_extract(script_runner):
     ret = script_runner.run('tnefparse', '-z', '-p', tmpdir, 'tests/examples/one-file.tnef')
     assert os.path.isfile(tmpdir + '/attachments.zip')
     assert ret.stderr == 'Successfully wrote attachments.zip\n'
+    with open(tmpdir + '/attachments.zip', 'rb') as zip_fp:
+        zip_stream = io.BytesIO(zip_fp.read())
+    zip_file = zipfile.ZipFile(zip_stream)
+    assert zip_file.namelist() == ['AUTHORS']
     assert ret.success
     shutil.rmtree(tmpdir)
 
