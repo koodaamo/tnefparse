@@ -2,6 +2,11 @@
 """
 import logging
 import os
+import warnings
+from typing import Union
+from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
+from io import BytesIO
+from functools import singledispatch
 from datetime import datetime
 from uuid import UUID
 
@@ -389,13 +394,15 @@ def triples(data):
 
     return sender.rstrip(b'\x00'), etype, email.rstrip(b'\x00')
 
+def to_zip(tnef:Union[TNEF, bytes], default_name='no-name', deflate=True):
+    "Convert attachments in TNEF data to zip format."
 
-def to_zip(data, default_name='no-name', deflate=True):
-    "Convert attachments in TNEF data to zip format. Accepts and returns str type."
-    # Parse the TNEF data
-    tnef = TNEF(data)
+    if isinstance(tnef, bytes):
+        msg = "passing bytes to tnef.to_zip will be deprecated, pass a TNEF object instead"
+        warnings.warn(msg, DeprecationWarning)
+        tnef = TNEF(tnef)
 
-    # Convert the TNEF file to an equivalent ZIP file
+    # Extract attachments found in the TNEF object
     tozip = {}
     for attachment in tnef.attachments:
         filename = attachment.name or default_name
@@ -407,18 +414,14 @@ def to_zip(data, default_name='no-name', deflate=True):
         else:
             tozip[filename] = [(attachment.data, filename)]
 
-    # Add each attachment in the TNEF file to the zip file
-    from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
-    from io import BytesIO
-    import contextlib
-
+    # Add each attachment to the zip file
     sfp = BytesIO()
-    zf = ZipFile(sfp, "w", ZIP_DEFLATED if deflate else ZIP_STORED)
-    with contextlib.closing(zf) as z:
+    with ZipFile(sfp, "w", ZIP_DEFLATED if deflate else ZIP_STORED) as zf:
         for filename, entries in list(tozip.items()):
             for entry in entries:
                 data, name = entry
-                z.writestr(name, data)
+                zf.writestr(name, data)
 
     # Return the binary data for the zip file
     return sfp.getvalue()
+

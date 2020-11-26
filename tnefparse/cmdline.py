@@ -101,12 +101,10 @@ def tnefparse():
             sys.exit()
 
         elif args.zip:
-            tfp.seek(0)
+            zipped = to_zip(t)
             pth = args.path.rstrip(os.sep) + os.sep if args.path else ''
-            test = tfp.read()
-            a = to_zip(test)
             with open(pth + 'attachments.zip', "wb") as afp:
-                afp.write(a)
+                afp.write(zipped)
             sys.stderr.write("Successfully wrote attachments.zip\n")
             sys.exit()
 
