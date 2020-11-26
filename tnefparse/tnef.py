@@ -97,13 +97,13 @@ class TNEFAttachment:
         self.data = b''
 
     @property
-    def name(self):
+    def name(self) -> str:
         if isinstance(self._name, bytes):
             return self._name.decode().strip('\x00')
         else:
             return self._name.strip('\x00')
 
-    def long_filename(self):
+    def long_filename(self) -> str:
         atname = Attribute.MAPI_ATTACH_LONG_FILENAME
         name = [a.data for a in self.mapi_attrs if a.name == atname]
         if name:
@@ -326,7 +326,8 @@ class TNEF:
     def rtfbody(self):
         if self._rtfbody:
             try:
-                from compressed_rtf import decompress
+                # compressed_rtf is not typed yet
+                from compressed_rtf import decompress  # type: ignore
                 return decompress(self._rtfbody + b'\x00')
             except ImportError:
                 logger.warning("Returning compressed RTF. Install compressed_rtf to decompress")

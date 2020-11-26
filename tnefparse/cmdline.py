@@ -47,7 +47,7 @@ argument('-d', '--dump', action="store_true", default=False,
          help="extract a json dump of the tnef contents")
 
 
-def tnefparse():
+def tnefparse() -> None:
     "command-line script"
 
     if len(sys.argv) == 1:
@@ -97,7 +97,7 @@ def tnefparse():
             sys.stderr.write("Successfully wrote %i files\n" % len(t.attachments))
             sys.exit()
 
-        def print_body(attr, description):
+        def print_body(attr: str, description: str) -> None:
             body = getattr(t, attr)
             if body is None:
                 sys.exit("No %s found" % description)
