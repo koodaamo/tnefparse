@@ -3,7 +3,6 @@
 import logging
 import struct
 import uuid
-import warnings
 from datetime import datetime, timedelta
 
 logger = logging.getLogger(__package__)
