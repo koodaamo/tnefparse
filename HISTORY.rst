@@ -7,6 +7,7 @@ tnefparse 1.4.0 (unreleased)
 - add Python 3.9 support (jugmac00)
 - introduce using type annotations (jugmac00)
 - remove deprecated parseFile & raw_mapi functions
+- fix str representation for TNEF class (jugmac00)
 
 tnefparse 1.3.1 (2020-09-30)
 =============================
