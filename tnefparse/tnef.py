@@ -337,7 +337,7 @@ class TNEF:
 
     def __str__(self):
         atts = (", %i attachments" % len(self.attachments)) if self.attachments else ''
-        return f"<{self.__class__.__name__}:0x{self.key:2.2x}{atts}>"
+        return f"<{self.__class__.__name__}:0x{self.key:02x}{atts}>"
 
     def dump(self, force_strings=False):
         def get_data(a):
