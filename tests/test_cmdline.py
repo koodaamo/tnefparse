@@ -91,3 +91,11 @@ def test_help_is_printed(script_runner):
     assert help_text in ret.stdout
     assert "positional arguments" in ret.stdout
     assert "optional argument" in ret.stdout
+
+
+def test_print_overview(script_runner):
+    ret = script_runner.run('tnefparse', '-o', 'tests/examples/one-file.tnef')
+    assert "Overview of tests/examples/one-file.tnef" in ret.stdout
+    assert "Attachments" in ret.stdout
+    assert "Objects" in ret.stdout
+    assert "Properties" in ret.stdout
