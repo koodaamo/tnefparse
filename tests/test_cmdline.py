@@ -82,3 +82,12 @@ def test_handle_value_errors(mocked_TNEF):
     with pytest.raises(SystemExit):
         from tnefparse.cmdline import tnefparse
         tnefparse()
+
+
+def test_help_is_printed(script_runner):
+    """calling `tnefparse` with no argument prints help text"""
+    ret = script_runner.run('tnefparse')
+    help_text = "Extract TNEF file contents. Show this help message if no arguments are given."
+    assert help_text in ret.stdout
+    assert "positional arguments" in ret.stdout
+    assert "optional argument" in ret.stdout
