@@ -5,6 +5,7 @@ tnefparse 1.4.0 (unreleased)
 - drop Python 2 support
 - drop Python 3.5 support (jugmac00)
 - add Python 3.9 support (jugmac00)
+- command-line support for zipped export of attachments (Beercow)
 - introduce using type annotations (jugmac00)
 - remove deprecated parseFile & raw_mapi functions
 - fix str representation for TNEF class (jugmac00)

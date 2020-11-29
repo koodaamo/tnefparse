@@ -34,6 +34,7 @@ found inside them and so on::
    -h, --help             show this help message and exit
    -o, --overview         show (possibly long) overview of TNEF file contents
    -a, --attachments      extract attachments, by default to current dir
+   -z, --zip              extract attachments into a single zip file, by default to current dir
    -p PATH, --path PATH   optional explicit path to extract attachments to
    -b, --body             extract the body to stdout
    -hb, --htmlbody        extract the HTML body to stdout

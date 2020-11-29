@@ -5,7 +5,7 @@ import os
 import sys
 
 from . import properties
-from .tnef import TNEF
+from .tnef import TNEF, to_zip
 
 logging.basicConfig()
 logger = logging.getLogger(__package__)
@@ -24,6 +24,9 @@ argument('-o', '--overview', action='store_true',
 
 argument('-a', '--attachments', action='store_true',
          help='extract attachments, by default to current dir')
+
+argument('-z', '--zip', action='store_true',
+         help='extract attachments into a single zip file, by default to current dir')
 
 argument('-p', '--path',
          help='optional explicit path to extract attachments to')
@@ -95,6 +98,14 @@ def tnefparse() -> None:
                 with open(pth + a.long_filename(), "wb") as afp:
                     afp.write(a.data)
             sys.stderr.write("Successfully wrote %i files\n" % len(t.attachments))
+            sys.exit()
+
+        elif args.zip:
+            zipped = to_zip(t)
+            pth = args.path.rstrip(os.sep) + os.sep if args.path else ''
+            with open(pth + 'attachments.zip', "wb") as afp:
+                afp.write(zipped)
+            sys.stderr.write("Successfully wrote attachments.zip\n")
             sys.exit()
 
         def print_body(attr: str, description: str) -> None:
