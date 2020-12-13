@@ -9,7 +9,7 @@ tnefparse 1.4.0 (unreleased)
 - introduce using type annotations (jugmac00)
 - remove deprecated parseFile & raw_mapi functions
 - fix str representation for TNEF class (jugmac00)
-- replace the evil^H^Hal call with more pythonic construct (eumiro)
+- prefer `getattr` over `eval` (eumiro)
 
 tnefparse 1.3.1 (2020-09-30)
 =============================
