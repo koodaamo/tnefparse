@@ -50,18 +50,20 @@ argument('-d', '--dump', action="store_true", default=False,
          help="extract a json dump of the tnef contents")
 
 
-def tnefparse() -> None:
+def tnefparse(argv=None) -> None:
     "command-line script"
 
-    if len(sys.argv) == 1:
+    if argv is None:
+        argv = sys.argv[1:]
+
+    if not argv:
         parser.print_help()
         sys.exit(1)
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.logging:
-        level = eval("logging." + args.logging)
-        logger.setLevel(level)
+        logger.setLevel(getattr(logging, args.logging))
 
     for tfp in args.file[0]:
         try:
