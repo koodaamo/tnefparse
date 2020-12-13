@@ -10,6 +10,7 @@ tnefparse 1.4.0 (unreleased)
 - remove deprecated parseFile & raw_mapi functions
 - fix str representation for TNEF class (jugmac00)
 - prefer `getattr` over `eval` (eumiro)
+- fix `test_zip` deprecation warning for bytes (1nF0rmed)
 
 tnefparse 1.3.1 (2020-09-30)
 =============================
