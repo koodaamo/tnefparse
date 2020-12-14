@@ -1,6 +1,7 @@
 import logging
 import os
 import tempfile
+import pytest
 
 from tnefparse import TNEF
 from tnefparse.tnef import to_zip
@@ -106,10 +107,11 @@ def test_decode(tnefspec):
 
 def test_zip():
     # remove this test once tnef.to_zip(bytes) is no longer supported
-    with open(datadir + os.sep + 'one-file.tnef', "rb") as tfile:
-        zip_data = to_zip(TNEF(tfile.read()))
-        with tempfile.TemporaryFile() as out:
-            out.write(zip_data)
+    with pytest.deprecated_call():
+        with open(datadir + os.sep + 'one-file.tnef', "rb") as tfile:
+            zip_data = to_zip(tfile.read())
+            with tempfile.TemporaryFile() as out:
+                out.write(zip_data)
 
 
 def to_shortname(longname):
