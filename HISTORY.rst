@@ -11,6 +11,8 @@ tnefparse 1.4.0 (unreleased)
 - fix str representation for TNEF class (jugmac00)
 - prefer `getattr` over `eval` (eumiro)
 - fix `test_zip` deprecation warning for bytes (1nF0rmed)
+- correctly handle attachments of embedded objects (jrideout)
+- add expirimental support for parsing embedded message objects (jrideout)
 
 tnefparse 1.3.1 (2020-09-30)
 =============================
