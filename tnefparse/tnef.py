@@ -364,6 +364,8 @@ class TNEF:
             }
             for att in o.mapi_attrs:
                 attachment[att.name_str] = get_data(att)
+            if hasattr(o, 'embed'):
+                attachment['embedded_message'] = o.embed.dump(force_strings)
             out['attachments'].append(attachment)
         for o in self.msgprops:
             data = get_data(o)
