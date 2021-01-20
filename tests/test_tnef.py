@@ -1,4 +1,5 @@
 import os
+import pytest
 from tnefparse.tnef import TNEF
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -20,3 +21,10 @@ def test_tnef_msg_embed():
     t2 = t.attachments[0].embed
 
     assert str(t2) == "<TNEF:0x1708>"
+
+
+def test_bad_signature():
+    tnef_data = open(os.path.join(THIS_DIR, __file__), mode="rb").read()
+
+    with pytest.raises(ValueError, match=r"Wrong TNEF signature: 0x\w+"):
+        TNEF(tnef_data)
