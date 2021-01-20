@@ -387,11 +387,6 @@ class TNEF:
         return out
 
 
-def valid_version(data):
-    version = uint32(data)
-    return version == 0x10000
-
-
 def triples(data):
     assert uint16(data) == 4
     # struct_length = uint16(data, 2)
