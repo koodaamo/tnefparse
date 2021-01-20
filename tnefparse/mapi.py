@@ -210,7 +210,7 @@ class TNEFMAPI_Attribute:
             return systime(self.raw_data)
         elif self.attr_type == SZMAPI_CLSID:
             return guid(self.raw_data)
-        elif self.attr_type == SZMAPI_BINARY:
+        elif self.attr_type in (SZMAPI_BINARY, SZMAPI_OBJECT):
             return b''.join([s.rstrip(b'\x00') for s in self.raw_data])
         elif self.attr_type in (SZMAPI_STRING, SZMAPI_UNICODE_STRING):
             return ''.join([s.rstrip('\x00') for s in self.raw_data])
