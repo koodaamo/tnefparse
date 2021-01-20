@@ -50,6 +50,8 @@ SPECS = (
     ("unicode-mapi-attr.tnef", 0x408f, ['example.dat'], 'body', []),
     ("umlaut.tnef", 0xa2e, ['TBZ PARIV GmbH.jpg', 'image003.jpg', 'UmlautAnhang-\xe4\xfc\xf6.txt'], 'rtfbody', []),
     ("bad_checksum.tnef", 0x5784, ['image001.png'], 'body', []),
+    ("IPM-DistList.tnef", 0x1708, ['Untitled Attachment'], 'rtfbody',
+     [0x9006, 0x9007, 0x8008, 0x08, 0x09, 0x9003, 0x9002, 0x8010, 0x8013, 0x800F, 0x8011, 0x9005]),
 )
 
 
@@ -75,6 +77,7 @@ def test_decode(tnefspec):
 
         for i, a in enumerate(t.attachments):
             assert a.long_filename() == attchs[i]
+            assert type(a.data) is bytes
             for m in a.mapi_attrs:
                 assert m.__str__()
                 assert m.data is not None
