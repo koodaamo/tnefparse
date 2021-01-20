@@ -43,6 +43,9 @@ SZMAPI_BEATS_THE_HELL_OUTTA_ME = 0x0033
 MULTI_VALUE_FLAG = 0x1000
 GUID_EXISTS_FLAG = 0x8000
 
+IMESSAGE_SIG = b"\x07\x03\x02\x00\x00\x00\x00\x00\xc0\x00\x00\x00\x00\x00\x00\x46"
+IMESSAGE_SIG_LEN = len(IMESSAGE_SIG)
+
 
 def decode_mapi(data, codepage='cp1252', starting_offset=None):
     "decode MAPI types"

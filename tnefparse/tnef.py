@@ -11,7 +11,7 @@ from uuid import UUID
 
 from . import properties as Attribute
 from .codepage import Codepage
-from .mapi import decode_mapi
+from .mapi import decode_mapi, IMESSAGE_SIG, IMESSAGE_SIG_LEN
 from .util import typtime, bytes_to_int, checksum, uint32, uint16, uint8
 
 logger = logging.getLogger(__package__)
@@ -127,6 +127,8 @@ class TNEFAttachment:
                     self._name = p.data
                 elif p.name == Attribute.MAPI_ATTACH_DATA_OBJ:
                     self.data = p.data
+                    if self.data.startswith(IMESSAGE_SIG):
+                        self.embed = TNEF(self.data[IMESSAGE_SIG_LEN:])
                 elif p.name == Attribute.MAPI_ATTACH_RENDERING:
                     pass
                 else:
