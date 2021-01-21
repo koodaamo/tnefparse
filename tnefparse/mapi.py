@@ -50,7 +50,7 @@ IMESSAGE_SIG_LEN = len(IMESSAGE_SIG)
 def decode_mapi(data, codepage='cp1252', starting_offset=None):
     """decode MAPI types"""
 
-    dataLen = len(data)
+    data_len = len(data)
     attrs = []
     offset = starting_offset or 0
     num_properties = uint32(data, offset)
@@ -58,7 +58,7 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
 
     try:
         for i in range(num_properties):
-            if offset >= dataLen:
+            if offset >= data_len:
                 logger.warning("Skipping property %r", i)
                 continue
 
@@ -81,13 +81,13 @@ def decode_mapi(data, codepage='cp1252', starting_offset=None):
                     guid_prop = uint32(data, offset)
                     offset += 4
                 else:
-                    iidLen = uint32(data, offset)
+                    iid_len = uint32(data, offset)
                     offset += 4
-                    r = iidLen % 4
+                    r = iid_len % 4
                     if r != 0:
-                        iidLen += 4 - r
-                    guid_name = data[offset: offset + iidLen].decode('utf-16')
-                    offset += iidLen
+                        iid_len += 4 - r
+                    guid_name = data[offset: offset + iid_len].decode('utf-16')
+                    offset += iid_len
 
             num_mv_properties = None
             if MULTI_VALUE_FLAG & attr_type:
