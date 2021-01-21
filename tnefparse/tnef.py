@@ -1,12 +1,13 @@
 """extracts TNEF encoded content from for example winmail.dat attachments.
 """
 import logging
+import os
 import warnings
-from typing import Union
-from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
-from io import BytesIO
 from datetime import datetime
+from io import BytesIO
+from typing import Union
 from uuid import UUID
+from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
 
 from . import properties as Attribute
 from .codepage import Codepage
@@ -407,18 +408,20 @@ def to_zip(tnef: Union[TNEF, bytes], default_name='no-name', deflate=True):
     # Extract attachments found in the TNEF object
     tozip = {}
     for attachment in tnef.attachments:
-        filename = attachment.name or default_name
+        filename = attachment.long_filename() or default_name
         if tozip.get(filename):
-            length = len(tozip.get(filename))
             # uniqify this file name by adding -<num> before the extension
-            filename = filename.with_stem(f"{filename.stem}-{length + 1}")
-        tozip[filename] = [(attachment.data, filename)]
+            length = len(tozip.get(filename))
+            root, ext = os.path.splitext(filename)
+            tozip[filename].append((f"{root}-{length + 1}{ext}", attachment.data))
+        else:
+            tozip[filename] = [(filename, attachment.data)]
 
     # Add each attachment to the zip file
     sfp = BytesIO()
     with ZipFile(sfp, "w", ZIP_DEFLATED if deflate else ZIP_STORED) as zf:
-        for filename, entries in tozip.items():
-            for data, name in entries:
+        for entries in tozip.values():
+            for name, data in entries:
                 zf.writestr(name, data)
 
     # Return the binary data for the zip file
