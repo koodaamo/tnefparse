@@ -125,10 +125,14 @@ class TNEFAttachment:
             for p in mapi_attrs:
                 if p.name == Attribute.MAPI_ATTACH_FILENAME:
                     self._name = p.data
+                elif p.name == Attribute.MAPI_DISPLAY_NAME and not self._name:
+                    self._name = p.data
                 elif p.name == Attribute.MAPI_ATTACH_DATA_OBJ:
-                    self.data = p.data
-                    if self.data.startswith(IMESSAGE_SIG):
-                        self.embed = TNEF(self.data[IMESSAGE_SIG_LEN:])
+                    if p.data.startswith(IMESSAGE_SIG):
+                        self.data = p.data[IMESSAGE_SIG_LEN:]
+                        self.embed = TNEF(self.data)
+                    else:
+                        self.data = p.data
                 elif p.name == Attribute.MAPI_ATTACH_RENDERING:
                     pass
                 else:
