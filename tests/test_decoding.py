@@ -1,6 +1,7 @@
 import logging
 import os
-import tempfile
+from pathlib import Path
+
 import pytest
 
 from tnefparse import TNEF
@@ -8,7 +9,8 @@ from tnefparse.tnef import to_zip
 from tnefparse.mapi import TNEFMAPI_Attribute
 
 logging.basicConfig()
-datadir = os.path.dirname(os.path.realpath(__file__)) + os.sep + "examples"
+
+DATADIR = Path(__file__).resolve().parent / "examples"
 
 SPECS = (
     ("body.tnef", 0x1125, [], 'htmlbody',
@@ -67,54 +69,51 @@ def objcodes(tnef):
 
 def test_decode(tnefspec):
     fn, key, attchs, body, objs = tnefspec
-    with open(datadir + os.sep + fn, "rb") as tfile:
-        t = TNEF(tfile.read())
-        assert t.key == key, f"wrong key: 0x{t.key:2.2x}"
+    t = TNEF((DATADIR / fn).read_bytes())
+    assert t.key == key, f"wrong key: 0x{t.key:2.2x}"
 
-        for m in t.mapiprops:
+    for m in t.mapiprops:
+        assert m.__str__()
+        assert m.data is not None
+
+    for i, a in enumerate(t.attachments):
+        assert a.long_filename() == attchs[i]
+        assert type(a.data) is bytes
+        for m in a.mapi_attrs:
             assert m.__str__()
             assert m.data is not None
 
-        for i, a in enumerate(t.attachments):
-            assert a.long_filename() == attchs[i]
-            assert type(a.data) is bytes
-            for m in a.mapi_attrs:
-                assert m.__str__()
-                assert m.data is not None
+    for m in t.msgprops:
+        assert m.__str__()
+        assert m.data is not None
+        if m.name == TNEF.ATTRECIPTABLE:
+            for n_m in m.data[0]:
+                assert isinstance(n_m, TNEFMAPI_Attribute)
 
-        for m in t.msgprops:
-            assert m.__str__()
-            assert m.data is not None
-            if m.name == TNEF.ATTRECIPTABLE:
-                for n_m in m.data[0]:
-                    assert isinstance(n_m, TNEFMAPI_Attribute)
+    if t.htmlbody:
+        assert 'html' in t.htmlbody
 
-        if t.htmlbody:
-            assert 'html' in t.htmlbody
+    if body:
+        assert getattr(t, body)
+        assert t.has_body()
+    else:
+        assert not t.has_body()
 
-        if body:
-            assert getattr(t, body)
-            assert t.has_body()
-        else:
-            assert not t.has_body()
+    if t.rtfbody:
+        assert t.rtfbody[0:5] == b'{\\rtf'
 
-        if t.rtfbody:
-            assert t.rtfbody[0:5] == b'{\\rtf'
+    if objs:
+        assert objcodes(t) == objs, "wrong objs: " + str([f"0x{o.name:2.2x}" for o in t.objects])
 
-        if objs:
-            assert objcodes(t) == objs, "wrong objs: " + str([f"0x{o.name:2.2x}" for o in t.objects])
-
-        assert t.dump(True)
-        assert t.dump(False)
+    assert t.dump(True)
+    assert t.dump(False)
 
 
-def test_zip():
+def test_zip(tmp_path):
     # remove this test once tnef.to_zip(bytes) is no longer supported
     with pytest.deprecated_call():
-        with open(datadir + os.sep + 'one-file.tnef', "rb") as tfile:
-            zip_data = to_zip(tfile.read())
-            with tempfile.TemporaryFile() as out:
-                out.write(zip_data)
+        zip_data = to_zip((DATADIR / "one-file.tnef").read_bytes())
+        (tmp_path / "output").write_bytes(zip_data)
 
 
 def to_shortname(longname):

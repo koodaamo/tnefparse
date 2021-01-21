@@ -1,8 +1,8 @@
 import argparse
 import json
 import logging
-import os
 import sys
+from pathlib import Path
 
 from . import properties
 from .tnef import TNEF, to_zip
@@ -28,7 +28,7 @@ argument('-a', '--attachments', action='store_true',
 argument('-z', '--zip', action='store_true',
          help='extract attachments into a single zip file, by default to current dir')
 
-argument('-p', '--path',
+argument('-p', '--path', type=Path, default=Path(),
          help='optional explicit path to extract attachments to')
 
 argument('-b', '--body', action='store_true',
@@ -95,18 +95,14 @@ def tnefparse(argv=None) -> None:
             print(json.dumps(t.dump(force_strings=True), sort_keys=True, indent=4))
 
         elif args.attachments:
-            pth = args.path.rstrip(os.sep) + os.sep if args.path else ''
-            for a in t.attachments:
-                with open(pth + a.long_filename(), "wb") as afp:
-                    afp.write(a.data)
+            for attachment in t.attachments:
+                (args.path / attachment.long_filename()).write_bytes(attachment.data)
             sys.stderr.write(f"Successfully wrote {len(t.attachments)} files\n")
             sys.exit()
 
         elif args.zip:
             zipped = to_zip(t)
-            pth = args.path.rstrip(os.sep) + os.sep if args.path else ''
-            with open(pth + 'attachments.zip', "wb") as afp:
-                afp.write(zipped)
+            (args.path / 'attachments.zip').write_bytes(zipped)
             sys.stderr.write("Successfully wrote attachments.zip\n")
             sys.exit()
 

@@ -8,19 +8,19 @@ Use:
 
 """
 from collections import OrderedDict
+from pathlib import Path
 
 properties = OrderedDict()
 
-with open('data/properties.txt') as props:
-    for prop in props:
-        prop = prop.strip()
-        if not prop or prop.startswith('#'):
-            continue
-        name, val = prop.split(' ')
-        properties[name] = val
+for prop in Path('data/properties.txt').read_text().splitlines():
+    prop = prop.strip()
+    if not prop or prop.startswith('#'):
+        continue
+    name, val = prop.split(' ')
+    properties[name] = val
 sort_by_val = OrderedDict(sorted(properties.items(), key=lambda t: t[1]))
 
-with open('tnefparse/properties.py', 'w') as out:
+with Path('tnefparse/properties.py').open('w') as out:
 
     out.write('''"""
 Property reference docs:

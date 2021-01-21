@@ -1,17 +1,12 @@
+from pathlib import Path
 from setuptools import setup, find_packages
 
 version = '1.4.0.dev0'
 
-with open('README.rst') as readme_file:
-    readme = readme_file.read()
-
-with open('HISTORY.rst') as history_file:
-    history = history_file.read()
-
 setup(name='tnefparse',
       version=version,
       description="a TNEF decoding library written in Python, without external dependencies",
-      long_description=readme + '\n\n' + history,
+      long_description=Path('README.rst').read_text() + '\n\n' + Path('HISTORY.rst').read_text(),
       classifiers=[
           'Topic :: Communications :: Email',
           'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
