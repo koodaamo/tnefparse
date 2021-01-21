@@ -1,4 +1,4 @@
-"MAPI attribute definitions"
+"""MAPI attribute definitions"""
 
 import logging
 from decimal import Decimal
@@ -48,7 +48,7 @@ IMESSAGE_SIG_LEN = len(IMESSAGE_SIG)
 
 
 def decode_mapi(data, codepage='cp1252', starting_offset=None):
-    "decode MAPI types"
+    """decode MAPI types"""
 
     dataLen = len(data)
     attrs = []
