@@ -51,7 +51,7 @@ argument('-d', '--dump', action="store_true", default=False,
 
 
 def tnefparse(argv=None) -> None:
-    "command-line script"
+    """command-line script"""
 
     if argv is None:
         argv = sys.argv[1:]

@@ -18,7 +18,7 @@ logger = logging.getLogger(__package__)
 
 
 class TNEFObject:
-    "a TNEF object that may contain a property and an attachment"
+    """a TNEF object that may contain a property and an attachment"""
     PTYPE_CLASS  = 0x1  # noqa: E221
     PTYPE_TIME   = 0x3  # noqa: E221
     PTYPE_STRING = 0x7  # noqa: E221
@@ -51,7 +51,7 @@ class TNEFObject:
 
 
 class TNEFAttachment:
-    "a TNEF attachment"
+    """a TNEF attachment"""
 
     SZMAPI_UNSPECIFIED = 0x0000  # MAPI Unspecified
     SZMAPI_NULL = 0x0001  # MAPI null property
@@ -155,7 +155,7 @@ class TNEFAttachment:
 
 
 class TNEF:
-    "main decoder class - start by using this"
+    """main decoder class - start by using this"""
 
     TNEF_SIGNATURE = 0x223E9F78
     LVL_MESSAGE = 0x01
@@ -398,7 +398,7 @@ def triples(data):
 
 
 def to_zip(tnef: Union[TNEF, bytes], default_name='no-name', deflate=True):
-    "Convert attachments in TNEF data to zip format."
+    """Convert attachments in TNEF data to zip format."""
 
     if isinstance(tnef, bytes):
         msg = "passing bytes to tnef.to_zip will be deprecated, pass a TNEF object instead"

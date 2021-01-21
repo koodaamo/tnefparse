@@ -60,7 +60,7 @@ def typtime(byte_arr, offset=0):
 
 
 def bytes_to_int(byte_arr):
-    "transform multi-byte values into integers"
+    """transform multi-byte values into integers"""
     return int.from_bytes(byte_arr, byteorder="little", signed=False)
 
 
