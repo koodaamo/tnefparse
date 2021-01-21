@@ -1,6 +1,11 @@
 name: Run the package tests
 
-on: [push]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: 42 0 * * 5
+  workflow_dispatch:
 
 jobs:
   build:
