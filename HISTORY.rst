@@ -13,6 +13,7 @@ tnefparse 1.4.0 (unreleased)
 - fix `test_zip` deprecation warning for bytes (1nF0rmed)
 - correctly handle attachments of embedded objects (jrideout)
 - add expirimental support for parsing embedded message objects (jrideout)
+- zipped output now uses long filename when possible (jrideout)
 
 tnefparse 1.3.1 (2020-09-30)
 =============================
