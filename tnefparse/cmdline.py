@@ -99,7 +99,7 @@ def tnefparse(argv=None) -> None:
             for a in t.attachments:
                 with open(pth + a.long_filename(), "wb") as afp:
                     afp.write(a.data)
-            sys.stderr.write("Successfully wrote %i files\n" % len(t.attachments))
+            sys.stderr.write(f"Successfully wrote {len(t.attachments)} files\n")
             sys.exit()
 
         elif args.zip:

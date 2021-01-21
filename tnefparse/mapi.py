@@ -231,4 +231,4 @@ class TNEFMAPI_Attribute:
         )
 
     def __str__(self):
-        return "<ATTR: %s>" % (self.name_str)
+        return f"<ATTR: {self.name_str}>"

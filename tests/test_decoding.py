@@ -69,7 +69,7 @@ def test_decode(tnefspec):
     fn, key, attchs, body, objs = tnefspec
     with open(datadir + os.sep + fn, "rb") as tfile:
         t = TNEF(tfile.read())
-        assert t.key == key, "wrong key: 0x%2.2x" % t.key
+        assert t.key == key, f"wrong key: 0x{t.key:2.2x}"
 
         for m in t.mapiprops:
             assert m.__str__()
@@ -102,7 +102,7 @@ def test_decode(tnefspec):
             assert t.rtfbody[0:5] == b'{\\rtf'
 
         if objs:
-            assert objcodes(t) == objs, "wrong objs: %s" % ["0x%2.2x" % o.name for o in t.objects]
+            assert objcodes(t) == objs, "wrong objs: " + str([f"0x{o.name:2.2x}" for o in t.objects])
 
         assert t.dump(True)
         assert t.dump(False)
