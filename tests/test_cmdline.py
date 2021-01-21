@@ -31,13 +31,13 @@ def test_cmdline_attch_extract(script_runner):
 
 def test_cmdline_zip_extract(script_runner):
     tmpdir = tempfile.mkdtemp()
-    ret = script_runner.run('tnefparse', '-z', '-p', tmpdir, 'tests/examples/one-file.tnef')
+    ret = script_runner.run('tnefparse', '-z', '-p', tmpdir, 'tests/examples/duplicate_filename.tnef')
     assert os.path.isfile(tmpdir + '/attachments.zip')
     assert ret.stderr == 'Successfully wrote attachments.zip\n'
     with open(tmpdir + '/attachments.zip', 'rb') as zip_fp:
         zip_stream = io.BytesIO(zip_fp.read())
     zip_file = zipfile.ZipFile(zip_stream)
-    assert zip_file.namelist() == ['AUTHORS']
+    assert zip_file.namelist() == ['file_abcdefgh.txt', 'file_abcdefgh-2.txt', 'VIA_Nytt_14021.htm']
     assert ret.success
     shutil.rmtree(tmpdir)
 
