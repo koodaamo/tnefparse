@@ -1,10 +1,10 @@
 """extracts TNEF encoded content from for example winmail.dat attachments.
 """
 import logging
-import os
 import warnings
 from datetime import datetime
 from io import BytesIO
+from pathlib import Path
 from typing import Union
 from uuid import UUID
 from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
@@ -408,12 +408,12 @@ def to_zip(tnef: Union[TNEF, bytes], default_name='no-name', deflate=True):
     # Extract attachments found in the TNEF object
     tozip = {}
     for attachment in tnef.attachments:
-        filename = attachment.long_filename() or default_name
+        filename = Path(attachment.long_filename() or default_name)
         if tozip.get(filename):
             # uniqify this file name by adding -<num> before the extension
             length = len(tozip.get(filename))
-            root, ext = os.path.splitext(filename)
-            tozip[filename].append((f"{root}-{length + 1}{ext}", attachment.data))
+            newname = f"{filename.stem}-{length + 1}{filename.suffix}"
+            tozip[filename].append((filename.with_name(newname), attachment.data))
         else:
             tozip[filename] = [(filename, attachment.data)]
 
@@ -422,7 +422,7 @@ def to_zip(tnef: Union[TNEF, bytes], default_name='no-name', deflate=True):
     with ZipFile(sfp, "w", ZIP_DEFLATED if deflate else ZIP_STORED) as zf:
         for entries in tozip.values():
             for name, data in entries:
-                zf.writestr(name, data)
+                zf.writestr(str(name), data)
 
     # Return the binary data for the zip file
     return sfp.getvalue()

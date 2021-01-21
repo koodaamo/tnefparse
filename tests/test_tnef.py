@@ -1,19 +1,21 @@
-import os
+from pathlib import Path
+
 import pytest
+
 from tnefparse.tnef import TNEF
 
-THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+HERE = Path(__file__).resolve().parent
 
 
 def test_tnef_str_representation():
-    tnef_data = open(os.path.join(THIS_DIR, "examples", "two-files.tnef"), mode="rb").read()
+    tnef_data = (HERE / "examples" / "two-files.tnef").read_bytes()
     t = TNEF(tnef_data)
 
     assert str(t) == "<TNEF:0x237, 2 attachments>"
 
 
 def test_tnef_msg_embed():
-    tnef_data = open(os.path.join(THIS_DIR, "examples", "IPM-DistList.tnef"), mode="rb").read()
+    tnef_data = (HERE / "examples" / "IPM-DistList.tnef").read_bytes()
     t = TNEF(tnef_data)
 
     assert str(t) == "<TNEF:0x1708, 1 attachments>"
@@ -24,7 +26,7 @@ def test_tnef_msg_embed():
 
 
 def test_bad_signature():
-    tnef_data = open(os.path.join(THIS_DIR, __file__), mode="rb").read()
+    tnef_data = Path(__file__).read_bytes()
 
     with pytest.raises(ValueError, match=r"Wrong TNEF signature: 0x\w+"):
         TNEF(tnef_data)
