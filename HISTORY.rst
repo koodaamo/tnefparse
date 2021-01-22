@@ -17,6 +17,7 @@ tnefparse 1.4.0 (unreleased)
 - run GitHub Actions CI for pull requests and once a week (eumiro)
 - use pathlib instead of os.path (eumiro)
 - change logger name for mapi to the package name (jrideout)
+- add unit tests for mapi attribute parsing (jrideout)
 
 tnefparse 1.3.1 (2020-09-30)
 =============================
