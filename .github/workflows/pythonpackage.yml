@@ -1,4 +1,4 @@
-name: Run the package tests
+name: CI
 
 on:
   push:

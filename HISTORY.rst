@@ -18,6 +18,8 @@ tnefparse 1.4.0 (unreleased)
 - use pathlib instead of os.path (eumiro)
 - change logger name for mapi to the package name (jrideout)
 - add unit tests for mapi attribute parsing (jrideout)
+- do not use Travis CI any more (jugmac00)
+
 
 tnefparse 1.3.1 (2020-09-30)
 =============================
