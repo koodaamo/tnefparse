@@ -38,5 +38,5 @@ jobs:
     - name: Test with pytest
       run: |
         pip install -e .[optional]
-        pip install pytest pytest-console-scripts
-        pytest
+        pip install pytest pytest-console-scripts pytest-cov codecov
+        pytest --cov
