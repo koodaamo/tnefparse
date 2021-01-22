@@ -16,6 +16,7 @@ tnefparse 1.4.0 (unreleased)
 - zipped output now uses long filename when possible (jrideout)
 - run GitHub Actions CI for pull requests and once a week (eumiro)
 - use pathlib instead of os.path (eumiro)
+- change logger name for mapi to the package name (jrideout)
 
 tnefparse 1.3.1 (2020-09-30)
 =============================

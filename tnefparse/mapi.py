@@ -18,7 +18,7 @@ from .util import (
 )
 from . import properties
 
-logger = logging.getLogger("mapi-decode")
+logger = logging.getLogger(__package__)
 
 
 SZMAPI_UNSPECIFIED    = 0x0000  # MAPI Unspecified  # noqa: E221
