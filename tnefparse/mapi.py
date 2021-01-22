@@ -38,7 +38,6 @@ SZMAPI_UNICODE_STRING = 0x001F  # MAPI unicode-string (null terminated)  # noqa:
 SZMAPI_SYSTIME        = 0x0040  # MAPI time (64 bits)  # noqa: E221
 SZMAPI_CLSID          = 0x0048  # MAPI OLE GUID  # noqa: E221
 SZMAPI_BINARY         = 0x0102  # MAPI binary  # noqa: E221
-SZMAPI_BEATS_THE_HELL_OUTTA_ME = 0x0033
 
 MULTI_VALUE_FLAG = 0x1000
 GUID_EXISTS_FLAG = 0x8000
@@ -214,12 +213,13 @@ class TNEFMAPI_Attribute:
             return systime(self.raw_data)
         elif self.attr_type == SZMAPI_CLSID:
             return guid(self.raw_data)
-        elif self.attr_type in (SZMAPI_BINARY, SZMAPI_OBJECT):
-            return b''.join([s.rstrip(b'\x00') for s in self.raw_data])
         elif self.attr_type in (SZMAPI_STRING, SZMAPI_UNICODE_STRING):
             return ''.join([s.rstrip('\x00') for s in self.raw_data])
-        else:
-            return self.raw_data
+
+        if self.attr_type not in (SZMAPI_UNSPECIFIED, SZMAPI_BINARY, SZMAPI_OBJECT):
+            logger.warning(f"Unknown data type: 0x{self.attr_type:04x}")
+
+        return b''.join([s.rstrip(b'\x00') for s in self.raw_data])
 
     @property
     def name_str(self):
