@@ -1,8 +1,9 @@
 tnefparse - TNEF decoding and attachment extraction
 ===================================================
 
-.. image:: https://travis-ci.com/koodaamo/tnefparse.png?branch=master
-  :target: https://travis-ci.com/koodaamo/tnefparse
+.. image:: https://github.com/koodaamo/tnefparse/workflows/CI/badge.svg?branch=master
+   :target: https://github.com/koodaamo/tnefparse/actions?workflow=CI
+   :alt: CI Status
 
 .. image:: https://codecov.io/gh/koodaamo/tnefparse/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/koodaamo/tnefparse
