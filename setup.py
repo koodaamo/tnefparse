@@ -1,7 +1,7 @@
 from pathlib import Path
 from setuptools import setup, find_packages
 
-version = '1.4.0.dev0'
+version = '1.4.0'
 
 setup(name='tnefparse',
       version=version,
