@@ -9,7 +9,6 @@ from .tnef import TNEF, to_zip
 
 logging.basicConfig()
 logger = logging.getLogger(__package__)
-logger.setLevel(logging.ERROR)
 
 
 descr = 'Extract TNEF file contents. Show this help message if no arguments are given.'
@@ -40,7 +39,7 @@ argument('-hb', '--htmlbody', action='store_true',
 argument('-rb', '--rtfbody', action='store_true',
          help='extract the RTF body to stdout')
 
-argument('-l', '--logging', choices=["DEBUG", "INFO", "WARN", "ERROR"],
+argument('-l', '--logging', choices=["DEBUG", "INFO", "WARN", "ERROR"], default="ERROR",
          help="enable logging by setting a log level")
 
 argument('-c', '--checksum', action="store_true", default=False,
@@ -62,8 +61,7 @@ def tnefparse(argv=None) -> None:
 
     args = parser.parse_args(argv)
 
-    if args.logging:
-        logger.setLevel(getattr(logging, args.logging))
+    logger.setLevel(getattr(logging, args.logging))
 
     for tfp in args.file[0]:
         try:
