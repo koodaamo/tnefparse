@@ -112,7 +112,7 @@ class TNEFAttachment:
         name = [a.data for a in self.mapi_attrs if a.name == atname]
         if name:
             return name[0]
-        return self.name
+        return (self.name or 'unlabeled_attachment.bin')
 
     def add_attr(self, attribute):
         # For now, we ignore rendering/preview properties
