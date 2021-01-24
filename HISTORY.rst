@@ -1,5 +1,5 @@
 
-tnefparse 1.4.0 (unreleased)
+tnefparse 1.4.0 (2021-01-24)
 =============================
 
 - drop Python 2 support
