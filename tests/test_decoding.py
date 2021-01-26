@@ -54,6 +54,7 @@ SPECS = (
     ("bad_checksum.tnef", 0x5784, ['image001.png'], 'body', []),
     ("IPM-DistList.tnef", 0x1708, ['Untitled Attachment'], 'rtfbody',
      [0x9006, 0x9007, 0x8008, 0x08, 0x09, 0x9003, 0x9002, 0x8010, 0x8013, 0x800F, 0x8011, 0x9005]),
+    ("minimal_attachment.tnef", 0x0000, ['unknown.dat'], None, []),
 )
 
 
@@ -70,7 +71,7 @@ def objcodes(tnef):
 def test_decode(tnefspec):
     fn, key, attchs, body, objs = tnefspec
     t = TNEF((DATADIR / fn).read_bytes())
-    assert t.key == key, f"wrong key: 0x{t.key:2.2x}"
+    assert t.key == key, f"wrong key: 0x{t.key:04x}"
 
     for m in t.mapiprops:
         assert m.__str__()

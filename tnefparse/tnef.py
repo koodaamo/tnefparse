@@ -112,7 +112,7 @@ class TNEFAttachment:
         name = [a.data for a in self.mapi_attrs if a.name == atname]
         if name:
             return name[0]
-        return (self.name or 'unlabeled_attachment.bin')
+        return self.name or 'unknown.dat'
 
     def add_attr(self, attribute):
         # For now, we ignore rendering/preview properties
@@ -259,8 +259,6 @@ class TNEF:
             if obj.name == TNEF.ATTATTACHRENDDATA:
                 attachment = TNEFAttachment(self.codepage)
                 self.attachments.append(attachment)
-
-            # print(TNEF.codes.get(obj.name), hex(obj.type))
 
             if obj.level == TNEF.LVL_ATTACHMENT:
                 attachment.add_attr(obj)
