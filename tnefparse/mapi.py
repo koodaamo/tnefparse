@@ -151,7 +151,7 @@ def parse_property(data, offset, attr_name, attr_type, codepage, is_multi):
             item = data[offset: offset + length]
             if attr_type == SZMAPI_UNICODE_STRING:
                 item = item.decode('utf-16')
-            elif attr_type == SZMAPI_STRING:
+            elif attr_type in (SZMAPI_STRING, SZMAPI_BINARY):
                 item = item.decode(codepage)
             attr_data.append(item)
             offset += length
