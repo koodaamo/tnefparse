@@ -33,7 +33,7 @@ Property reference docs:
 |                |                |   some of the address book tagged properties (those with names beginning with |
 |                |                |   PIDTagAddressBook). Many are static property IDs but are in this range.     |
 +----------------+----------------+-------------------------------------------------------------------------------+
-"""  # noqa: E501
+"""
 
 
 MAPI_ACKNOWLEDGEMENT_MODE = 0x0001
@@ -683,6 +683,7 @@ MAPI_APPOINTMENT_NOT_ALLOW_PROPOSE = 0x825A
 MAPI_APPT_TZDEF_START_DISPLAY = 0x825E
 MAPI_APPT_TZDEF_END_DISPLAY = 0x825F
 MAPI_APPT_TZDEF_RECUR = 0x8260
+MAPI_INBOUND_ICAL = 0x827A
 MAPI_REMINDER_MINUTES_BEFORE_START = 0x8501
 MAPI_REMINDER_TIME = 0x8502
 MAPI_REMINDER_SET = 0x8503
@@ -1366,6 +1367,7 @@ CODE_TO_NAME = {
     MAPI_APPT_TZDEF_START_DISPLAY: "MAPI_APPT_TZDEF_START_DISPLAY",
     MAPI_APPT_TZDEF_END_DISPLAY: "MAPI_APPT_TZDEF_END_DISPLAY",
     MAPI_APPT_TZDEF_RECUR: "MAPI_APPT_TZDEF_RECUR",
+    MAPI_INBOUND_ICAL: "MAPI_INBOUND_ICAL",
     MAPI_REMINDER_MINUTES_BEFORE_START: "MAPI_REMINDER_MINUTES_BEFORE_START",
     MAPI_REMINDER_TIME: "MAPI_REMINDER_TIME",
     MAPI_REMINDER_SET: "MAPI_REMINDER_SET",
