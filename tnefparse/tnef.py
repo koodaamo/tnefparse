@@ -103,7 +103,7 @@ class TNEFAttachment:
     @property
     def name(self) -> str:
         if isinstance(self._name, bytes):
-            return self._name.decode().strip('\x00')
+            return self._name.decode(encoding=self.codepage).strip('\x00')
         else:
             return self._name.strip('\x00')
 
