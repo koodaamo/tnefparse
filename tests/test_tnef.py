@@ -30,3 +30,10 @@ def test_bad_signature():
 
     with pytest.raises(ValueError, match=r"Wrong TNEF signature: 0x\w+"):
         TNEF(tnef_data)
+
+
+def test_tnef_htmlbody_hebrew_text():
+    tnef_data = (HERE / "examples" / "iso-8859-8-i.tnef").read_bytes()
+    t = TNEF(tnef_data)
+    unicode_slice = t.htmlbody[1795:1799]
+    assert unicode_slice == u'\u05d5\u05d5\u05d0\u05dc', "Unexpected val in htmlbody"
