@@ -102,7 +102,11 @@ def test_help_is_printed(script_runner):
     help_text = "Extract TNEF file contents. Show this help message if no arguments are given."
     assert help_text in ret.stdout
     assert "positional arguments" in ret.stdout
-    assert "optional argument" in ret.stdout
+    if sys.version_info < (3, 10):
+        assert "optional arguments" in ret.stdout
+    else:
+        assert "Extract TNEF file contents" in ret.stdout
+        assert "-d, --dump" in ret.stdout
 
 
 def test_print_overview(script_runner):
